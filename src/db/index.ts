@@ -1,19 +1,22 @@
-import env from "@/env"
-import { drizzle } from "drizzle-orm/postgres-js"
-import postgres from "postgres"
-import * as schema from "./schema"
+import { Kysely, ParseJSONResultsPlugin, PostgresDialect } from "kysely"
+import pg from "pg"
+import { env } from "process"
+import type { Database } from "./types.ts"
 
-export const connection = postgres(env.DATABASE_URL, {
-  max: env.DB_MIGRATING || env.DB_SEEDING ? 1 : undefined,
-  // eslint-disable-next-line no-empty-function
-  onnotice: env.DB_SEEDING ? () => {} : undefined,
+const { Pool, types } = pg
+types.setTypeParser(types.builtins.NUMERIC, (value: any) => parseFloat(value))
+
+export const dialect = new PostgresDialect({
+  pool: new Pool({
+    user: env.DB_USER,
+    host: env.DB_HOST,
+    database: env.DB_NAME,
+    password: env.DB_PASSWORD,
+    port: Number(env.DB_PORT),
+  }),
 })
 
-export const db = drizzle(connection, {
-  schema,
-  logger: true,
+export const db = new Kysely<Database>({
+  dialect,
+  plugins: [new ParseJSONResultsPlugin()],
 })
-
-export type dbType = typeof db
-
-export default db

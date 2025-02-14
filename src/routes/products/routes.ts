@@ -1,30 +1,30 @@
-import { usersResponseSchema } from "@/db/schema/users"
 import { jsonContent } from "@/utils/router"
 import { createRoute, z } from "@hono/zod-openapi"
 import { Status } from "better-status-codes"
+import { ProductSchema } from "./schemas"
 
-const tags = ["User"]
+const tags = ["Products"]
 
-export const getUsers = createRoute({
+export const getProducts = createRoute({
   tags,
-  path: "/users",
+  path: "/products",
   method: "get",
   responses: {
-    [Status.OK]: jsonContent(z.array(usersResponseSchema), "Get users"),
+    [Status.OK]: jsonContent(z.array(ProductSchema), "Get products"),
   },
 })
 
-export const getUserById = createRoute({
+export const getProductById = createRoute({
   tags,
-  path: "/users/{id}",
+  path: "/products/{id}",
   method: "get",
   params: z.object({ id: z.number() }),
   responses: {
-    [Status.OK]: jsonContent(usersResponseSchema, "Get user by id"),
+    [Status.OK]: jsonContent(ProductSchema, "Get product"),
     [Status.NOT_FOUND]: jsonContent(
       z.object({
         error: z.string().openapi({
-          example: "User not found",
+          example: "Product not found",
         }),
       }),
       "User not found"
@@ -40,5 +40,5 @@ export const getUserById = createRoute({
   },
 })
 
-export type GetUsersRoute = typeof getUsers
-export type GetUserByIdRoute = typeof getUserById
+export type GetProductsRoute = typeof getProducts
+export type GetProductByIdRoute = typeof getProductById

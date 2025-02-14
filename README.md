@@ -21,13 +21,13 @@
 4. Migrer la base de données
 
    ```bash
-   pnpm run db:migrate
+   pnpm kysely migrate:latest
    ```
 
 5. Seeder la base de données
 
    ```bash
-   pnpm run db:seed
+   pnpm run seed:run
    ```
 
 6. Lancer le serveur en dev
@@ -63,24 +63,51 @@ Exemples de commits:
 - `fix(cart): bug fix in cart`
 - `feat(users): added user management`
 - `docs(readme): updated README.md`
+
 - `chore(deps): updated dependencies`
 
 ## Migration de base de données 📚
 
-- Modifier ou crée un schema dans `/src/db/schemas/...`
-- Adapter les seeder en fonction des modifications dans `/src/db/seeds/...`
-- Générer la migration avec la commande
+- Crée une nouvelle migration
   ```bash
-  pnpm run db:generate
+  pnpm kysely migrate:make <name>
   ```
-- Migrer la base de données avec la commande
+- Faire la logique de migration
+
+- Migrer la base de données
   ```bash
-  pnpm run db:migrate
+  pnpm kysely migrate:up
+  ```
+- Changer les types de `Database` dans le fichier `src/db/types.ts` en fonction des changement de votre migration
+
+### Extra
+
+- Annuler la migration (si besoin)
+
+  ```bash
+  pnpm kysely migrate:down
   ```
 
-## Autres commandes utiles 👨‍💻
+- Faire toute les migrations de base de données
 
-- ### Interface pour la base de données
   ```bash
-  pnpm run db:studio
+  pnpm kysely migrate:latest
+  ```
+
+- Annuler toute les migrations de base de données
+  ```bash
+  pnpm kysely migrate:rollback
+  ```
+
+## Seed de base de données 🌱
+
+- Crée une nouvelle seed
+  ```bash
+  pnpm kysely seed:make <name>
+  ```
+- Faire la logique de seed
+
+- Seed la base de données
+  ```bash
+  pnpm kysely seed:
   ```

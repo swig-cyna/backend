@@ -1,6 +1,6 @@
 import auth from "@/routes/auth/index.js"
 import index from "@/routes/index.js"
-import users from "@/routes/users/index.js"
+import products from "@/routes/products/index.js"
 import { configOpenApi } from "@/utils/openApi.js"
 import { createRouter } from "@/utils/router.js"
 import { serve } from "@hono/node-server"
@@ -11,7 +11,7 @@ const app = createRouter()
 
 configOpenApi(app)
 
-const routes = [index, auth, users]
+const routes = [index, auth, products]
 
 routes.forEach((route) => {
   app.route("/", route)

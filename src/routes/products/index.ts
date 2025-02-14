@@ -6,8 +6,8 @@ import * as routes from "./routes.js"
 const router = createRouter()
 
 const routeHandlers = [
-  { route: routes.getUsers, handler: handlers.getUsers },
-  { route: routes.getUserById, handler: handlers.getUserById },
+  { route: routes.getProducts, handler: handlers.getProducts },
+  { route: routes.getProductById, handler: handlers.getProduct },
 ]
 
 routeHandlers.forEach(({ route, handler }) => {
