@@ -27,6 +27,7 @@
     "@typescript-eslint/eslint-plugin": "^8.16.0",
     "@typescript-eslint/parser": "^8.16.0",
     "bcrypt": "^5.1.1",
+    "better-auth": "^1.1.17",
     "better-status-codes": "^2.0.5",
     "dotenv": "^16.4.5",
     "dotenv-expand": "^11.0.7",
@@ -35,7 +36,6 @@
     "hono": "^4.6.10",
     "kysely": "^0.27.5",
     "pg": "^8.13.1",
-    "postgres": "^3.4.5",
     "zod": "^3.23.8"
   },
   "devDependencies": {

@@ -8,7 +8,7 @@ export const configOpenApi = (app: OpenAPIHono) => {
     info: {
       version: packageJson.version,
       title: "Market API",
-    },
+    }
   })
 
   app.get(

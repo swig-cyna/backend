@@ -11,7 +11,6 @@ const EnvSchema = z.object({
   DB_PASSWORD: z.string(),
   DB_NAME: z.string(),
   DB_PORT: z.string().transform(Number),
-  DATABASE_URL: z.string(),
   DB_SEEDING: z
     .string()
     .transform((v) => v === "true")
@@ -21,7 +20,10 @@ const EnvSchema = z.object({
     .transform((v) => v === "true")
     .default("false"),
   JWT_SECRET: z.string(),
+  BETTER_AUTH_SECRET : z.string(),
+  BETTER_AUTH_URL : z.string(),
 })
+
 
 expand(config())
 
