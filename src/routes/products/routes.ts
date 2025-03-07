@@ -27,7 +27,7 @@ export const getProductById = createRoute({
           example: "Product not found",
         }),
       }),
-      "User not found"
+      "User not found",
     ),
     [Status.BAD_REQUEST]: jsonContent(
       z.object({
@@ -35,10 +35,31 @@ export const getProductById = createRoute({
           example: "Invalid id",
         }),
       }),
-      "Invalid id"
+      "Invalid id",
+    ),
+  },
+})
+
+export const createProduct = createRoute({
+  tags,
+  path: "/products",
+  method: "post",
+  request: {
+    body: jsonContent(ProductSchema, "Product data"),
+  },
+  responses: {
+    [Status.CREATED]: jsonContent(ProductSchema, "Product created"),
+    [Status.BAD_REQUEST]: jsonContent(
+      z.object({ error: z.string().openapi({ example: "Invalid data" }) }),
+      "Invalid data",
+    ),
+    [Status.INTERNAL_SERVER_ERROR]: jsonContent(
+      z.object({ error: z.string().openapi({ example: "Stripe error" }) }),
+      "Stripe error",
     ),
   },
 })
 
 export type GetProductsRoute = typeof getProducts
 export type GetProductByIdRoute = typeof getProductById
+export type CreateProductRoute = typeof createProduct

@@ -8,6 +8,7 @@ const router = createRouter()
 const routeHandlers = [
   { route: routes.getProducts, handler: handlers.getProducts },
   { route: routes.getProductById, handler: handlers.getProduct },
+  { route: routes.createProduct, handler: handlers.createProduct },
 ]
 
 routeHandlers.forEach(({ route, handler }) => {
