@@ -8,7 +8,7 @@ export const configOpenApi = (app: OpenAPIHono) => {
     info: {
       version: packageJson.version,
       title: "Market API",
-    }
+    },
   })
 
   app.get(
@@ -17,12 +17,12 @@ export const configOpenApi = (app: OpenAPIHono) => {
       theme: "purple",
       layout: "classic",
       defaultHttpClient: {
-        targetKey: "javascript",
+        targetKey: "js",
         clientKey: "fetch",
       },
       spec: {
         url: "/doc",
       },
-    })
+    }),
   )
 }
