@@ -9,6 +9,7 @@ const routeHandlers = [
   { route: routes.getProducts, handler: handlers.getProducts },
   { route: routes.getProductById, handler: handlers.getProduct },
   { route: routes.createProduct, handler: handlers.createProduct },
+  { route: routes.updateProduct, handler: handlers.updateProduct },
 ]
 
 routeHandlers.forEach(({ route, handler }) => {

@@ -6,12 +6,11 @@ import type {
   GetProductByIdRoute,
   GetProductsRoute,
   CreateProductRoute,
+  UpdateProductRoute,
 } from "./routes"
 import env from "@/env"
 
-const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-01-27.acacia",
-})
+const stripe = new Stripe(env.STRIPE_SECRET_KEY)
 
 export const getProducts: AppRouteHandler<GetProductsRoute> = async (c) => {
   const products = await db.selectFrom("products").selectAll().execute()
@@ -73,6 +72,64 @@ export const createProduct: AppRouteHandler<CreateProductRoute> = async (c) => {
     return c.json(newProduct, Status.CREATED)
   } catch (err) {
     console.error("Erreur lors de la création du produit:", err)
+
+    return c.json(
+      { error: (err as Error).message },
+      Status.INTERNAL_SERVER_ERROR,
+    )
+  }
+}
+
+export const updateProduct: AppRouteHandler<UpdateProductRoute> = async (c) => {
+  try {
+    const { id: rawId } = c.req.param()
+    const id = Number(rawId)
+    const updates = c.req.valid("json")
+
+    const product = await db
+      .selectFrom("products")
+      .selectAll()
+      .where("id", "=", id)
+      .executeTakeFirst()
+
+    if (!product) {
+      return c.json({ error: "Product not found" }, Status.NOT_FOUND)
+    }
+
+    const stripeProduct = await stripe.products.update(
+      product.stripe_product_id,
+      {
+        name: updates.name,
+        description: updates.description,
+      },
+    )
+
+    await stripe.prices.update(product.stripe_price_id, { active: false })
+
+    const stripePrice = await stripe.prices.create({
+      product: stripeProduct.id,
+      unit_amount: Math.round(updates.price * 100),
+      currency: updates.currency,
+      recurring: { interval: updates.interval },
+    })
+
+    const [updatedProduct] = await db
+      .updateTable("products")
+      .set({
+        name: updates.name,
+        price: updates.price,
+        description: updates.description,
+        currency: updates.currency,
+        interval: updates.interval,
+        stripe_price_id: stripePrice.id,
+      })
+      .where("id", "=", id)
+      .returningAll()
+      .execute()
+
+    return c.json(updatedProduct, Status.OK)
+  } catch (err) {
+    console.error("Erreur lors de la modification du produit:", err)
 
     return c.json(
       { error: (err as Error).message },

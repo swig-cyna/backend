@@ -60,6 +60,36 @@ export const createProduct = createRoute({
   },
 })
 
+export const updateProduct = createRoute({
+  tags,
+  path: "/products/{id}",
+  method: "patch",
+  params: z.object({ id: z.number() }),
+  request: {
+    body: jsonContent(ProductSchema, "Product data"),
+  },
+  responses: {
+    [Status.OK]: jsonContent(ProductSchema, "Product updated"),
+    [Status.NOT_FOUND]: jsonContent(
+      z.object({
+        error: z.string().openapi({
+          example: "Product not found",
+        }),
+      }),
+      "User not found",
+    ),
+    [Status.BAD_REQUEST]: jsonContent(
+      z.object({ error: z.string().openapi({ example: "Invalid data" }) }),
+      "Invalid data",
+    ),
+    [Status.INTERNAL_SERVER_ERROR]: jsonContent(
+      z.object({ error: z.string().openapi({ example: "Stripe error" }) }),
+      "Stripe error",
+    ),
+  },
+})
+
 export type GetProductsRoute = typeof getProducts
 export type GetProductByIdRoute = typeof getProductById
 export type CreateProductRoute = typeof createProduct
+export type UpdateProductRoute = typeof updateProduct
