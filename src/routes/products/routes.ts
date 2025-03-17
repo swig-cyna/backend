@@ -89,7 +89,27 @@ export const updateProduct = createRoute({
   },
 })
 
+export const deleteProduct = createRoute({
+  tags,
+  path: "/products/{id}",
+  method: "delete",
+  params: z.object({ id: z.number() }),
+  responses: {
+    [Status.OK]: jsonContent(ProductSchema, "delete product"),
+
+    [Status.INTERNAL_SERVER_ERROR]: jsonContent(
+      z.object({
+        error: z.string().openapi({
+          example: "Invalid id",
+        }),
+      }),
+      "Invalid id",
+    ),
+  },
+})
+
 export type GetProductsRoute = typeof getProducts
 export type GetProductByIdRoute = typeof getProductById
 export type CreateProductRoute = typeof createProduct
 export type UpdateProductRoute = typeof updateProduct
+export type DeleteProductRoute = typeof deleteProduct

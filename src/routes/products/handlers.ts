@@ -7,6 +7,7 @@ import type {
   GetProductsRoute,
   CreateProductRoute,
   UpdateProductRoute,
+  DeleteProductRoute,
 } from "./routes"
 import env from "@/env"
 
@@ -14,8 +15,6 @@ const stripe = new Stripe(env.STRIPE_SECRET_KEY)
 
 export const getProducts: AppRouteHandler<GetProductsRoute> = async (c) => {
   const products = await db.selectFrom("products").selectAll().execute()
-
-  console.log(products)
 
   return c.json(products)
 }
@@ -130,6 +129,30 @@ export const updateProduct: AppRouteHandler<UpdateProductRoute> = async (c) => {
     return c.json(updatedProduct, Status.OK)
   } catch (err) {
     console.error("Erreur lors de la modification du produit:", err)
+
+    return c.json(
+      { error: (err as Error).message },
+      Status.INTERNAL_SERVER_ERROR,
+    )
+  }
+}
+
+export const deleteProduct: AppRouteHandler<DeleteProductRoute> = async (c) => {
+  try {
+    const { id: rawId } = c.req.param()
+    const id = Number(rawId)
+
+    const [products] = await db
+      .deleteFrom("products")
+      .where("id", "=", id)
+      .returningAll()
+      .execute()
+
+    await stripe.products.update(products.stripe_product_id, { active: false })
+
+    return c.json(products, Status.OK)
+  } catch (err) {
+    console.error("Erreur lors de la suppression du produit:", err)
 
     return c.json(
       { error: (err as Error).message },
