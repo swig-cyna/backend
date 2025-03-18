@@ -21,6 +21,7 @@ const EnvSchema = z.object({
     .transform((v) => v === "true")
     .default("false"),
   JWT_SECRET: z.string(),
+  STRIPE_SECRET_KEY: z.string(),
 })
 
 expand(config())

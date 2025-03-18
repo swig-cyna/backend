@@ -27,7 +27,7 @@ export const getProductById = createRoute({
           example: "Product not found",
         }),
       }),
-      "User not found"
+      "User not found",
     ),
     [Status.BAD_REQUEST]: jsonContent(
       z.object({
@@ -35,10 +35,81 @@ export const getProductById = createRoute({
           example: "Invalid id",
         }),
       }),
-      "Invalid id"
+      "Invalid id",
+    ),
+  },
+})
+
+export const createProduct = createRoute({
+  tags,
+  path: "/products",
+  method: "post",
+  request: {
+    body: jsonContent(ProductSchema, "Product data"),
+  },
+  responses: {
+    [Status.CREATED]: jsonContent(ProductSchema, "Product created"),
+    [Status.BAD_REQUEST]: jsonContent(
+      z.object({ error: z.string().openapi({ example: "Invalid data" }) }),
+      "Invalid data",
+    ),
+    [Status.INTERNAL_SERVER_ERROR]: jsonContent(
+      z.object({ error: z.string().openapi({ example: "Stripe error" }) }),
+      "Stripe error",
+    ),
+  },
+})
+
+export const updateProduct = createRoute({
+  tags,
+  path: "/products/{id}",
+  method: "patch",
+  params: z.object({ id: z.number() }),
+  request: {
+    body: jsonContent(ProductSchema, "Product data"),
+  },
+  responses: {
+    [Status.OK]: jsonContent(ProductSchema, "Product updated"),
+    [Status.NOT_FOUND]: jsonContent(
+      z.object({
+        error: z.string().openapi({
+          example: "Product not found",
+        }),
+      }),
+      "User not found",
+    ),
+    [Status.BAD_REQUEST]: jsonContent(
+      z.object({ error: z.string().openapi({ example: "Invalid data" }) }),
+      "Invalid data",
+    ),
+    [Status.INTERNAL_SERVER_ERROR]: jsonContent(
+      z.object({ error: z.string().openapi({ example: "Stripe error" }) }),
+      "Stripe error",
+    ),
+  },
+})
+
+export const deleteProduct = createRoute({
+  tags,
+  path: "/products/{id}",
+  method: "delete",
+  params: z.object({ id: z.number() }),
+  responses: {
+    [Status.OK]: jsonContent(ProductSchema, "delete product"),
+
+    [Status.INTERNAL_SERVER_ERROR]: jsonContent(
+      z.object({
+        error: z.string().openapi({
+          example: "Invalid id",
+        }),
+      }),
+      "Invalid id",
     ),
   },
 })
 
 export type GetProductsRoute = typeof getProducts
 export type GetProductByIdRoute = typeof getProductById
+export type CreateProductRoute = typeof createProduct
+export type UpdateProductRoute = typeof updateProduct
+export type DeleteProductRoute = typeof deleteProduct
