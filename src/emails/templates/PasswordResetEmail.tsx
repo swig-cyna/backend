@@ -14,19 +14,19 @@ import {
 } from "@react-email/components"
 import { FC } from "react"
 
-interface VerificationEmailProps {
+interface PasswordResetEmailProps {
   username: string
-  verificationLink: string
+  resetLink: string
 }
 
-const VerificationEmail: FC<Readonly<VerificationEmailProps>> = ({
+const PasswordResetEmail: FC<PasswordResetEmailProps> = ({
   username,
-  verificationLink,
+  resetLink,
 }) => {
   return (
     <Html>
       <Head />
-      <Preview>CYNA - Vérifiez votre adresse e-mail</Preview>
+      <Preview>CYNA - Réinitialisez votre mot de passe</Preview>
       <Tailwind>
         <Body className="bg-gray-900 font-sans">
           <Container className="mx-auto max-w-[600px] p-8">
@@ -39,22 +39,23 @@ const VerificationEmail: FC<Readonly<VerificationEmailProps>> = ({
                 className="mx-auto mb-6"
               />
               <Heading className="text-2xl font-bold text-white mb-4">
-                Vérification de votre e-mail
+                Réinitialisation de votre mot de passe
               </Heading>
               <Text className="text-gray-300 mb-6">Bonjour {username},</Text>
               <Text className="text-gray-300 mb-6">
-                Merci d'avoir créé un compte chez CYNA. Pour finaliser votre
-                inscription et sécuriser votre compte, veuillez vérifier votre
-                adresse e-mail.
+                Vous avez demandé la réinitialisation de votre mot de passe.
+                Cliquez sur le bouton ci-dessous pour créer un nouveau mot de
+                passe.
               </Text>
               <Button
-                href={verificationLink}
+                href={resetLink}
                 className="bg-[#302082] text-white font-semibold py-3 px-6 rounded-md hover:bg-[#3f2ba6] transition-colors"
               >
-                Vérifier mon e-mail
+                Réinitialiser mon mot de passe
               </Button>
               <Text className="text-gray-400 mt-6 text-sm">
-                Si vous n'avez pas créé de compte, veuillez ignorer cet e-mail.
+                Si vous n'avez pas demandé cette réinitialisation, veuillez
+                ignorer cet e-mail ou contacter notre support.
               </Text>
             </Section>
             <Section className="mt-8 text-center">
@@ -81,4 +82,4 @@ const VerificationEmail: FC<Readonly<VerificationEmailProps>> = ({
   )
 }
 
-export default VerificationEmail
+export default PasswordResetEmail

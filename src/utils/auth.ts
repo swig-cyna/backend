@@ -1,5 +1,8 @@
 import { dialect } from "@/db"
-import { sendVerificationEmail } from "@/emails/emailService"
+import {
+  sendPasswordResetEmail,
+  sendVerificationEmail,
+} from "@/emails/emailService"
 import env from "@/env"
 import { betterAuth } from "better-auth"
 import { openAPI } from "better-auth/plugins"
@@ -15,6 +18,10 @@ export const auth = betterAuth({
     minPasswordLength: 8,
     maxPasswordLength: 25,
     requireEmailVerification: true,
+    sendResetPassword: async ({ user, url }) => {
+      await sendPasswordResetEmail(user.email, user.name, url)
+    },
+    resetPasswordTokenExpiresIn: 3600,
   },
   emailVerification: {
     sendOnSignUp: true,
