@@ -17,12 +17,12 @@ export const configOpenApi = (app: OpenAPIHono) => {
       theme: "purple",
       layout: "classic",
       defaultHttpClient: {
-        targetKey: "javascript",
+        targetKey: "js",
         clientKey: "fetch",
       },
       spec: {
         url: "/doc",
       },
-    })
+    }),
   )
 }

@@ -1,7 +1,7 @@
 import { Kysely, ParseJSONResultsPlugin, PostgresDialect } from "kysely"
 import pg from "pg"
-import { env } from "process"
 import type { Database } from "./types.ts"
+import env from "../env.js"
 
 const { Pool, types } = pg
 types.setTypeParser(types.builtins.NUMERIC, (value: any) => parseFloat(value))
