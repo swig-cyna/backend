@@ -5,7 +5,7 @@ import { betterAuth } from "better-auth"
 import { openAPI } from "better-auth/plugins"
 
 export const auth = betterAuth({
-  trustedOrigins: [env.BETTER_AUTH_URL],
+  trustedOrigins: [env.FRONTEND_URL],
   database: {
     dialect,
     type: "postgres",
@@ -13,7 +13,7 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 8,
-    maxPasswordLength: 20,
+    maxPasswordLength: 25,
     requireEmailVerification: true,
   },
   emailVerification: {

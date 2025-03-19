@@ -6,8 +6,16 @@ import { serve } from "@hono/node-server"
 import "dotenv/config"
 import env from "./env"
 import { auth } from "./utils/auth"
+import { cors } from "hono/cors"
 
 const app = createRouter()
+
+app.use(
+  cors({
+    origin: [env.FRONTEND_URL],
+    credentials: true,
+  }),
+)
 
 configOpenApi(app)
 
