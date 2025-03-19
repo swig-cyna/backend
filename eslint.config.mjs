@@ -76,16 +76,6 @@ export default [
       "no-unused-private-class-members": "error",
       "arrow-body-style": ["error", "as-needed"],
 
-      camelcase: [
-        "error",
-        {
-          properties: "always",
-          ignoreDestructuring: true,
-          ignoreImports: true,
-          ignoreGlobals: true,
-        },
-      ],
-
       "capitalized-comments": [
         "error",
         "always",

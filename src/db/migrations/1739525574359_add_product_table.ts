@@ -9,6 +9,14 @@ export async function up(db: Kysely<any>): Promise<void> {
       col.notNull().check(sql`price >= 0`)
     )
     .addColumn("description", "text")
+    .addColumn("currency", "text", (col) => 
+      col.notNull().defaultTo("eur")
+    )
+    .addColumn("interval", "text", (col) =>
+      col.notNull().defaultTo("month")
+    )
+    .addColumn("stripe_product_id", "text", (col) => col.notNull().unique())
+    .addColumn("stripe_price_id", "text", (col) => col.notNull().unique())
     .addColumn("created_at", "timestamp", (col) =>
       col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`)
     )

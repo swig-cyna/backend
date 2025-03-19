@@ -19,11 +19,11 @@ const EnvSchema = z.object({
     .string()
     .transform((v) => v === "true")
     .default("false"),
-  JWT_SECRET: z.string(),
   BETTER_AUTH_SECRET: z.string(),
   BETTER_AUTH_URL: z.string(),
   RESEND_API_KEY: z.string(),
   FRONTEND_URL: z.string(),
+  STRIPE_SECRET_KEY: z.string(),
 })
 
 expand(config())
