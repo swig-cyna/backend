@@ -1,5 +1,6 @@
 import { dialect } from "@/db"
 import {
+  sendChangeEmail,
   sendPasswordResetEmail,
   sendVerificationEmail,
 } from "@/emails/emailService"
@@ -28,6 +29,14 @@ export const auth = betterAuth({
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
       await sendVerificationEmail(user.email, user.name, url)
+    },
+  },
+  user: {
+    changeEmail: {
+      enabled: true,
+      sendChangeEmailVerification: async ({ user, newEmail, url }) => {
+        await sendChangeEmail(user, newEmail, url)
+      },
     },
   },
   plugins: [openAPI()],
