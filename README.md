@@ -27,10 +27,19 @@
 5. Seeder la base de données
 
    ```bash
-   pnpm run seed:run
+   pnpm kysely seed:run
    ```
 
-6. Lancer le serveur en dev
+6. Crée le bucket dans minio
+
+   Sur http://localhost:9001/access-keys connecté vous avec les identifiant qui sont configuré dans le `.env`
+
+   En haut a droite cliquer sur `+ Create access key`
+   , puis ne toucher a rien et cliquer sur `Create`
+
+   Une fois crée, copier coller l'`Access Key` et la `Secret Key` dans le fichier `.env`
+
+7. Lancer le serveur en dev
 
    ```bash
    pnpm run dev
