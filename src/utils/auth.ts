@@ -6,7 +6,8 @@ import {
 } from "@/emails/emailService"
 import env from "@/env"
 import { betterAuth } from "better-auth"
-import { openAPI } from "better-auth/plugins"
+import { openAPI, admin as adminPlugin } from "better-auth/plugins"
+import { Roles } from "./permissions"
 
 export const auth = betterAuth({
   trustedOrigins: [env.FRONTEND_URL],
@@ -39,5 +40,10 @@ export const auth = betterAuth({
       },
     },
   },
-  plugins: [openAPI()],
+  plugins: [
+    openAPI(),
+    adminPlugin({
+      adminRoles: [Roles.ADMIN, Roles.SUPERADMIN],
+    }),
+  ],
 })

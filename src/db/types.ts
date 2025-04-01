@@ -20,6 +20,10 @@ export interface User {
   image: string | null
   createdAt: Date
   updatedAt: Date
+  role: string
+  banned: boolean
+  banReason: string | null
+  banExpires: number | null
 }
 
 export interface Account {
@@ -47,6 +51,7 @@ export interface Session {
   ipAddress: string | null
   userAgent: string | null
   userId: string
+  impersonatedBy: string | null
 }
 
 export interface Verification {
