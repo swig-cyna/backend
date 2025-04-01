@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "kysely": "kysely",
-    "prepare": "husky"
+    "prepare": "husky",
+    "s3:create": "node scripts/create-bucket.mjs"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -38,12 +39,13 @@
     "globals": "^15.15.0",
     "hono": "^4.7.4",
     "kysely": "^0.27.6",
+    "minio": "^8.0.5",
     "pg": "^8.14.0",
     "postgres": "^3.4.5",
-    "stripe": "^17.6.0",
     "react": "19.0.0",
     "react-dom": "^19.0.0",
     "resend": "^4.1.2",
+    "stripe": "^17.6.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {

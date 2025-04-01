@@ -30,14 +30,19 @@
    pnpm kysely seed:run
    ```
 
-6. Crée le bucket dans minio
+6. Créez le bucket dans MinIO
 
-   Sur http://localhost:9001/access-keys connecté vous avec les identifiant qui sont configuré dans le `.env`
+   Rendez-vous sur [http://localhost:9001/access-keys](http://localhost:9001/access-keys) et connectez-vous avec les identifiants configurés dans le fichier `.env`.
 
-   En haut a droite cliquer sur `+ Create access key`
-   , puis ne toucher a rien et cliquer sur `Create`
+   En haut à droite, cliquez sur `+ Create access key`, puis laissez les paramètres par défaut et cliquez sur `Create`.
 
-   Une fois crée, copier coller l'`Access Key` et la `Secret Key` dans le fichier `.env`
+   Une fois l'accès créé, copiez et collez l'`Access Key` ainsi que la `Secret Key` dans le fichier `.env`.
+
+   Pour créer le bucket, lancez le script avec la commande suivante :
+
+   ```bash
+    pnpm run s3:create
+   ```
 
 7. Lancer le serveur en dev
 
