@@ -24,6 +24,14 @@ export interface User {
   banned: boolean
   banReason: string | null
   banExpires: number | null
+  twoFactorEnabled: boolean
+}
+
+export interface TwoFactor {
+  id: Generated<string>
+  userId: string
+  secret: string
+  backupCodes: string
 }
 
 export interface Account {
@@ -66,6 +74,7 @@ export interface Verification {
 export interface Database {
   products: Product
   user: User
+  twoFactor: TwoFactor
   account: Account
   session: Session
   verification: Verification

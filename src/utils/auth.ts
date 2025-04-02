@@ -6,10 +6,11 @@ import {
 } from "@/emails/emailService"
 import env from "@/env"
 import { betterAuth } from "better-auth"
-import { openAPI, admin as adminPlugin } from "better-auth/plugins"
+import { openAPI, admin as adminPlugin, twoFactor } from "better-auth/plugins"
 import { Roles } from "./permissions"
 
 export const auth = betterAuth({
+  appName: "Cyna",
   trustedOrigins: [env.FRONTEND_URL],
   database: {
     dialect,
@@ -44,6 +45,13 @@ export const auth = betterAuth({
     openAPI(),
     adminPlugin({
       adminRoles: [Roles.ADMIN, Roles.SUPERADMIN],
+    }),
+    twoFactor({
+      skipVerificationOnEnable: false,
+      totpOptions: {
+        digits: 6,
+        period: 30,
+      },
     }),
   ],
 })
