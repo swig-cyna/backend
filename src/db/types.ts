@@ -1,5 +1,16 @@
 import type { ColumnType, Generated } from "kysely"
 
+export interface CarouselSlide {
+  id: Generated<number>
+  title: string
+  description: string
+  image: string
+  link: string
+  position: number
+  created_at?: ColumnType<Date, string | undefined, never>
+  updated_at?: ColumnType<Date, string | undefined, never>
+}
+
 export interface Product {
   id: Generated<number>
   name: string
@@ -64,4 +75,5 @@ export interface Database {
   account: Account
   session: Session
   verification: Verification
+  carousel: CarouselSlide
 }
