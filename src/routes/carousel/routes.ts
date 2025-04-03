@@ -1,7 +1,11 @@
 import { jsonContent } from "@/utils/router"
 import { createRoute, z } from "@hono/zod-openapi"
 import { Status } from "better-status-codes"
-import { CarouselSlidePositionSchema, CarouselSlideSchema } from "./schemas"
+import {
+  CarouselSlideEditSchema,
+  CarouselSlidePositionSchema,
+  CarouselSlideSchema,
+} from "./schemas"
 
 const tags = ["Carousel"]
 
@@ -45,10 +49,7 @@ export const createSlide = createRoute({
   path: "/carousel",
   method: "post",
   request: {
-    body: jsonContent(
-      CarouselSlideSchema.omit({ id: true }),
-      "Carousel slide data",
-    ),
+    body: jsonContent(CarouselSlideEditSchema, "Carousel slide data"),
   },
   responses: {
     [Status.CREATED]: jsonContent(CarouselSlideSchema, "Slide created"),
@@ -67,7 +68,7 @@ export const createSlide = createRoute({
 
 export const uploadSlideImage = createRoute({
   tags,
-  path: "/carousel/{id}/image",
+  path: "/carousel/image",
   method: "post",
   params: z.object({ id: z.number() }),
   request: {
@@ -91,7 +92,7 @@ export const uploadSlideImage = createRoute({
   responses: {
     [Status.OK]: jsonContent(
       z.object({
-        message: z.string(),
+        imageId: z.string(),
       }),
       "Image uploaded",
     ),
@@ -122,7 +123,7 @@ export const updateSlide = createRoute({
   method: "put",
   params: z.object({ id: z.number() }),
   request: {
-    body: jsonContent(CarouselSlideSchema.omit({ id: true }), "Slide data"),
+    body: jsonContent(CarouselSlideEditSchema, "Slide data"),
   },
   responses: {
     [Status.OK]: jsonContent(CarouselSlideSchema, "Slide updated"),
@@ -156,11 +157,16 @@ export const changeSlidePosition = createRoute({
     body: jsonContent(CarouselSlidePositionSchema, "Slide position data"),
   },
   responses: {
-    [Status.OK]: jsonContent(CarouselSlideSchema, "Slide updated"),
+    [Status.OK]: jsonContent(
+      z.object({
+        message: z.string(),
+      }),
+      "Slide updated",
+    ),
     [Status.NOT_FOUND]: jsonContent(
       z.object({
         error: z.string().openapi({
-          example: "SLide not found",
+          example: "Slide not found",
         }),
       }),
       "Slide not found",

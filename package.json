@@ -36,6 +36,7 @@
     "dotenv": "^16.4.7",
     "dotenv-expand": "^11.0.7",
     "eslint-config-prettier": "^9.1.0",
+    "file-type": "^20.4.1",
     "globals": "^15.15.0",
     "hono": "^4.7.4",
     "kysely": "^0.27.6",

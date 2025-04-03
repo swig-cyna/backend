@@ -1,8 +1,11 @@
 import { db } from "@/db"
 import env from "@/env"
-import { saveFileInBucket } from "@/utils/s3"
+import { deleteFileFromBucket, saveFileInBucket } from "@/utils/s3"
 import type { AppRouteHandler } from "@/utils/types"
 import { Status } from "better-status-codes"
+import { fileTypeFromBlob } from "file-type"
+import { nanoid } from "nanoid"
+
 import {
   ChangeSlidePositionRoute,
   CreateSlideRoute,
@@ -21,6 +24,50 @@ export const getCarousel: AppRouteHandler<GetCarouselRoute> = async (c) => {
     .execute()
 
   return c.json(slides)
+}
+
+export const uploadSlideImage: AppRouteHandler<UploadSlideImageRoute> = async (
+  c,
+) => {
+  try {
+    const body = await c.req.parseBody()
+    const file = body.image as File
+
+    if (!file) {
+      return c.json({ error: "Missing image" }, Status.BAD_REQUEST)
+    }
+
+    const arrayBuffer = await file.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+    const fileType = await fileTypeFromBlob(file)
+
+    if (!fileType || !["image/jpeg", "image/png"].includes(fileType.mime)) {
+      return c.json({ error: "Invalid file type" }, Status.BAD_REQUEST)
+    }
+
+    const extension = fileType.ext
+    const fileName = `${nanoid()}.${extension}`
+
+    await saveFileInBucket({
+      bucketName: env.S3_NAME,
+      fileName: `carousel/${fileName}`,
+      file: buffer,
+    })
+
+    return c.json(
+      {
+        imageId: fileName,
+      },
+      Status.OK,
+    )
+  } catch (err) {
+    console.error("Erreur lors de la modification du slide:", err)
+
+    return c.json(
+      { error: (err as Error).message },
+      Status.INTERNAL_SERVER_ERROR,
+    )
+  }
 }
 
 export const getCarouselSlide: AppRouteHandler<GetSlideRoute> = async (c) => {
@@ -49,7 +96,16 @@ export const createCarouselSlide: AppRouteHandler<CreateSlideRoute> = async (
   c,
 ) => {
   try {
-    const { title, description, image, link, position } = c.req.valid("json")
+    const { title, description, image, link } = c.req.valid("json")
+
+    const lastPosition = await db
+      .selectFrom("carousel")
+      .select("position")
+      .orderBy("position", "desc")
+      .limit(1)
+      .executeTakeFirst()
+
+    const position = lastPosition ? lastPosition.position + 1 : 0
 
     const [newSlide] = await db
       .insertInto("carousel")
@@ -66,55 +122,6 @@ export const createCarouselSlide: AppRouteHandler<CreateSlideRoute> = async (
     return c.json(newSlide, Status.CREATED)
   } catch (err) {
     console.error("Erreur lors de la création du slide:", err)
-
-    return c.json(
-      { error: (err as Error).message },
-      Status.INTERNAL_SERVER_ERROR,
-    )
-  }
-}
-
-export const uploadSlideImage: AppRouteHandler<UploadSlideImageRoute> = async (
-  c,
-) => {
-  try {
-    const { id: rawId } = c.req.param()
-    const id = Number(rawId)
-
-    const slide = await db
-      .selectFrom("carousel")
-      .selectAll()
-      .where("id", "=", id)
-      .executeTakeFirst()
-
-    if (!slide) {
-      return c.json({ error: "Slide not found" }, Status.NOT_FOUND)
-    }
-
-    const body = await c.req.parseBody()
-    const file = body.image as File
-
-    if (!file) {
-      return c.json({ error: "Missing image" }, Status.BAD_REQUEST)
-    }
-
-    const arrayBuffer = await file.arrayBuffer()
-    const buffer = Buffer.from(arrayBuffer)
-
-    await saveFileInBucket({
-      bucketName: env.S3_NAME,
-      fileName: file.name,
-      file: buffer,
-    })
-
-    return c.json(
-      {
-        message: "Image uploaded successfully",
-      },
-      Status.OK,
-    )
-  } catch (err) {
-    console.error("Erreur lors de la modification du slide:", err)
 
     return c.json(
       { error: (err as Error).message },
@@ -146,9 +153,8 @@ export const updateCarouselSlide: AppRouteHandler<UpdateSlideRoute> = async (
       .set({
         title: updates.title,
         description: updates.description,
-        image: updates.image,
+        ...(updates.image && { image: updates.image }),
         link: updates.link,
-        position: updates.position,
       })
       .where("id", "=", id)
       .returningAll()
@@ -170,12 +176,17 @@ export const changeCarouselSlidePosition: AppRouteHandler<
 > = async (c) => {
   try {
     const { id: rawId } = c.req.param()
+
+    if (!rawId) {
+      return c.json({ error: "Missing id" }, Status.BAD_REQUEST)
+    }
+
     const id = Number(rawId)
-    const { position } = c.req.valid("json")
+    const { position: newPosition } = c.req.valid("json")
 
     const slide = await db
       .selectFrom("carousel")
-      .selectAll()
+      .select(["id", "position"])
       .where("id", "=", id)
       .executeTakeFirst()
 
@@ -183,14 +194,37 @@ export const changeCarouselSlidePosition: AppRouteHandler<
       return c.json({ error: "Slide not found" }, Status.NOT_FOUND)
     }
 
-    const [updatedSlide] = await db
-      .updateTable("carousel")
-      .set({ position })
-      .where("id", "=", id)
-      .returningAll()
-      .execute()
+    const oldPosition = slide.position
 
-    return c.json(updatedSlide, Status.OK)
+    await db.transaction().execute(async (trx) => {
+      if (newPosition > oldPosition) {
+        await trx
+          .updateTable("carousel")
+          .set((eb) => ({
+            position: eb("position", "-", 1),
+          }))
+          .where("position", ">", oldPosition)
+          .where("position", "<=", newPosition)
+          .execute()
+      } else if (newPosition < oldPosition) {
+        await trx
+          .updateTable("carousel")
+          .set((eb) => ({
+            position: eb("position", "+", 1),
+          }))
+          .where("position", ">=", newPosition)
+          .where("position", "<", oldPosition)
+          .execute()
+      }
+
+      await trx
+        .updateTable("carousel")
+        .set({ position: newPosition })
+        .where("id", "=", id)
+        .execute()
+    })
+
+    return c.json({ message: "Slide position updated" }, Status.OK)
   } catch (err) {
     console.error("Erreur lors de la modification du slide:", err)
 
@@ -217,6 +251,11 @@ export const deleteCarouselSlide: AppRouteHandler<DeleteSlideRoute> = async (
     if (!deletedSlide) {
       return c.json({ error: "Slide not found" }, Status.NOT_FOUND)
     }
+
+    await deleteFileFromBucket({
+      bucketName: env.S3_NAME,
+      fileName: `carousel/${deletedSlide.image}`,
+    })
 
     return c.json(deletedSlide, Status.OK)
   } catch (err) {
