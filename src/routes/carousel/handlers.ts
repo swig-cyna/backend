@@ -56,7 +56,7 @@ export const createCarouselSlide: AppRouteHandler<CreateSlideRoute> = async (
       .values({
         title,
         description,
-        image,
+        image: image || "",
         link,
         position,
       })
@@ -110,7 +110,7 @@ export const uploadSlideImage: AppRouteHandler<UploadSlideImageRoute> = async (
     return c.json(
       {
         message: "Image uploaded successfully",
-      },  
+      },
       Status.OK,
     )
   } catch (err) {

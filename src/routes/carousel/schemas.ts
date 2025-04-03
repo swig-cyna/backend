@@ -4,7 +4,7 @@ export const CarouselSlideSchema = z.object({
   id: z.number(),
   title: z.string(),
   description: z.string(),
-  image: z.string(),
+  image: z.string().optional(),
   link: z.string().url(),
   position: z.number(),
 })
