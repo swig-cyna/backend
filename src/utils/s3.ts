@@ -4,7 +4,7 @@ import env from "@/env"
 import * as Minio from "minio"
 import stream from "stream"
 
-export const s3Client = new Minio.Client({
+const s3Client = new Minio.Client({
   endPoint: env.S3_ENDPOINT,
   port: env.S3_PORT ? Number(env.S3_PORT) : undefined,
   accessKey: env.S3_ACCESS_KEY,
@@ -20,7 +20,7 @@ export const checkBucketExists = async (bucketName: string) => {
   }
 }
 
-export const saveFileInBucket = async ({
+const saveFile = async ({
   bucketName,
   fileName,
   file,
@@ -31,7 +31,7 @@ export const saveFileInBucket = async ({
 }) => {
   await checkBucketExists(bucketName)
 
-  const fileExists = await checkFileExistsInBucket({
+  const fileExists = await checkIsExist({
     bucketName,
     fileName,
   })
@@ -43,7 +43,7 @@ export const saveFileInBucket = async ({
   await s3Client.putObject(bucketName, fileName, file)
 }
 
-export const checkFileExistsInBucket = async ({
+const checkIsExist = async ({
   bucketName,
   fileName,
 }: {
@@ -59,7 +59,7 @@ export const checkFileExistsInBucket = async ({
   return true
 }
 
-export const getFileFromBucket = async ({
+const getFile = async ({
   bucketName,
   fileName,
 }: {
@@ -77,7 +77,7 @@ export const getFileFromBucket = async ({
   return await s3Client.getObject(bucketName, fileName)
 }
 
-export const deleteFileFromBucket = async ({
+const deleteFile = async ({
   bucketName,
   fileName,
 }: {
@@ -93,4 +93,12 @@ export const deleteFileFromBucket = async ({
   }
 
   return true
+}
+
+export default {
+  checkBucketExists,
+  saveFile,
+  checkIsExist,
+  getFile,
+  deleteFile,
 }
