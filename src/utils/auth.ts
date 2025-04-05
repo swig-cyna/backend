@@ -16,6 +16,16 @@ export const auth = betterAuth({
     dialect,
     type: "postgres",
   },
+  advanced: {
+    crossSubDomainCookies: {
+      enabled: true,
+    },
+    defaultCookieAttributes: {
+      sameSite: "none",
+      secure: true,
+      partitioned: true,
+    },
+  },
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 8,
