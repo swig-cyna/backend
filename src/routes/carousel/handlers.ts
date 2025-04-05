@@ -1,6 +1,6 @@
 import { db } from "@/db"
 import env from "@/env"
-import { deleteFileFromBucket, saveFileInBucket } from "@/utils/s3"
+import bucket from "@/utils/s3"
 import type { AppRouteHandler } from "@/utils/types"
 import { Status } from "better-status-codes"
 import { fileTypeFromBlob } from "file-type"
@@ -48,7 +48,7 @@ export const uploadSlideImage: AppRouteHandler<UploadSlideImageRoute> = async (
     const extension = fileType.ext
     const fileName = `${nanoid()}.${extension}`
 
-    await saveFileInBucket({
+    await bucket.saveFile({
       bucketName: env.S3_NAME,
       fileName: `carousel/${fileName}`,
       file: buffer,
@@ -252,7 +252,7 @@ export const deleteCarouselSlide: AppRouteHandler<DeleteSlideRoute> = async (
       return c.json({ error: "Slide not found" }, Status.NOT_FOUND)
     }
 
-    await deleteFileFromBucket({
+    await bucket.deleteFile({
       bucketName: env.S3_NAME,
       fileName: `carousel/${deletedSlide.image}`,
     })
