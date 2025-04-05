@@ -1,6 +1,14 @@
 import type { Kysely } from "kysely"
 
 export async function seed(db: Kysely<any>): Promise<void> {
+  const existingProducts = await db.selectFrom("products").selectAll().execute()
+
+  if (existingProducts.length > 0) {
+    console.log("Products already exist")
+
+    return
+  }
+
   await db
     .insertInto("products")
     .values([
