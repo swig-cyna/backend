@@ -1,3 +1,4 @@
+import { adminMiddleware } from "@/utils/authMiddleware"
 import { jsonContent } from "@/utils/router"
 import { createRoute, z } from "@hono/zod-openapi"
 import { Status } from "better-status-codes"
@@ -22,6 +23,7 @@ export const getSlide = createRoute({
   tags,
   path: "/carousel/{id}",
   method: "get",
+  middleware: [adminMiddleware],
   params: z.object({ id: z.number() }),
   responses: {
     [Status.OK]: jsonContent(CarouselSlideSchema, "Get slide of carousel"),
@@ -48,6 +50,7 @@ export const createSlide = createRoute({
   tags,
   path: "/carousel",
   method: "post",
+  middleware: [adminMiddleware],
   request: {
     body: jsonContent(CarouselSlideEditSchema, "Carousel slide data"),
   },
@@ -70,6 +73,7 @@ export const uploadSlideImage = createRoute({
   tags,
   path: "/carousel/image",
   method: "post",
+  middleware: [adminMiddleware],
   params: z.object({ id: z.number() }),
   request: {
     body: {
@@ -121,6 +125,7 @@ export const updateSlide = createRoute({
   tags,
   path: "/carousel/{id}",
   method: "put",
+  middleware: [adminMiddleware],
   params: z.object({ id: z.number() }),
   request: {
     body: jsonContent(CarouselSlideEditSchema, "Slide data"),
@@ -152,6 +157,7 @@ export const changeSlidePosition = createRoute({
   tags,
   path: "/carousel/{id}/position",
   method: "put",
+  middleware: [adminMiddleware],
   params: z.object({ id: z.number() }),
   request: {
     body: jsonContent(CarouselSlidePositionSchema, "Slide position data"),
@@ -188,6 +194,7 @@ export const deleteSlide = createRoute({
   tags,
   path: "/carousel/{id}",
   method: "delete",
+  middleware: [adminMiddleware],
   params: z.object({ id: z.number() }),
   responses: {
     [Status.OK]: jsonContent(CarouselSlideSchema, "Delete carousel slide"),

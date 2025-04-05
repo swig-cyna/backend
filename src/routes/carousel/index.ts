@@ -5,21 +5,12 @@ import * as routes from "./routes.js"
 
 const router = createRouter()
 
-const routeHandlers = [
-  { route: routes.getCarousel, handler: handlers.getCarousel },
-  { route: routes.getSlide, handler: handlers.getCarouselSlide },
-  { route: routes.createSlide, handler: handlers.createCarouselSlide },
-  { route: routes.uploadSlideImage, handler: handlers.uploadSlideImage },
-  { route: routes.updateSlide, handler: handlers.updateCarouselSlide },
-  {
-    route: routes.changeSlidePosition,
-    handler: handlers.changeCarouselSlidePosition,
-  },
-  { route: routes.deleteSlide, handler: handlers.deleteCarouselSlide },
-]
-
-routeHandlers.forEach(({ route, handler }) => {
-  router.openapi(route, handler)
-})
+router.openapi(routes.getCarousel, handlers.getCarousel)
+router.openapi(routes.getSlide, handlers.getCarouselSlide)
+router.openapi(routes.createSlide, handlers.createCarouselSlide)
+router.openapi(routes.uploadSlideImage, handlers.uploadSlideImage)
+router.openapi(routes.updateSlide, handlers.updateCarouselSlide)
+router.openapi(routes.changeSlidePosition, handlers.changeCarouselSlidePosition)
+router.openapi(routes.deleteSlide, handlers.deleteCarouselSlide)
 
 export default router
