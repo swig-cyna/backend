@@ -31,6 +31,18 @@ export interface User {
   image: string | null
   createdAt: Date
   updatedAt: Date
+  role: string
+  banned: boolean
+  banReason: string | null
+  banExpires: number | null
+  twoFactorEnabled: boolean
+}
+
+export interface TwoFactor {
+  id: Generated<string>
+  userId: string
+  secret: string
+  backupCodes: string
 }
 
 export interface Account {
@@ -58,6 +70,7 @@ export interface Session {
   ipAddress: string | null
   userAgent: string | null
   userId: string
+  impersonatedBy: string | null
 }
 
 export interface Verification {
@@ -72,6 +85,7 @@ export interface Verification {
 export interface Database {
   products: Product
   user: User
+  twoFactor: TwoFactor
   account: Account
   session: Session
   verification: Verification

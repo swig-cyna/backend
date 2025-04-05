@@ -1,17 +1,30 @@
 import { dialect } from "@/db"
 import {
+  sendChangeEmail,
   sendPasswordResetEmail,
   sendVerificationEmail,
 } from "@/emails/emailService"
 import env from "@/env"
 import { betterAuth } from "better-auth"
-import { openAPI } from "better-auth/plugins"
+import { openAPI, admin as adminPlugin, twoFactor } from "better-auth/plugins"
+import { Roles } from "./permissions"
 
 export const auth = betterAuth({
+  appName: "Cyna",
   trustedOrigins: [env.FRONTEND_URL],
   database: {
     dialect,
     type: "postgres",
+  },
+  advanced: {
+    crossSubDomainCookies: {
+      enabled: true,
+    },
+    defaultCookieAttributes: {
+      sameSite: "none",
+      secure: true,
+      partitioned: true,
+    },
   },
   emailAndPassword: {
     enabled: true,
@@ -30,5 +43,25 @@ export const auth = betterAuth({
       await sendVerificationEmail(user.email, user.name, url)
     },
   },
-  plugins: [openAPI()],
+  user: {
+    changeEmail: {
+      enabled: true,
+      sendChangeEmailVerification: async ({ user, newEmail, url }) => {
+        await sendChangeEmail(user, newEmail, url)
+      },
+    },
+  },
+  plugins: [
+    openAPI(),
+    adminPlugin({
+      adminRoles: [Roles.ADMIN, Roles.SUPERADMIN],
+    }),
+    twoFactor({
+      skipVerificationOnEnable: false,
+      totpOptions: {
+        digits: 6,
+        period: 30,
+      },
+    }),
+  ],
 })
