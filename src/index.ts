@@ -6,6 +6,7 @@ import { createRouter } from "@/utils/router.js"
 import { serve } from "@hono/node-server"
 import "dotenv/config"
 import { cors } from "hono/cors"
+import { cronScheduler } from "./crons/scheduler"
 import env from "./env"
 import { auth } from "./utils/auth"
 
@@ -34,3 +35,5 @@ serve({
   fetch: app.fetch,
   port: env.PORT,
 })
+
+cronScheduler()
