@@ -5,7 +5,7 @@ export const createRouter = () => new OpenAPIHono({ strict: false })
 
 export const jsonContent = <T extends ZodSchema>(
   schema: T,
-  description: string
+  description: string,
 ) => ({
   content: {
     "application/json": {

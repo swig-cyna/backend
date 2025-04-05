@@ -27,10 +27,24 @@
 5. Seeder la base de données
 
    ```bash
-   pnpm run seed:run
+   pnpm kysely seed:run
    ```
 
-6. Lancer le serveur en dev
+6. Créez le bucket dans MinIO
+
+   Rendez-vous sur [http://localhost:9001/access-keys](http://localhost:9001/access-keys) et connectez-vous avec les identifiants configurés dans le fichier `.env`.
+
+   En haut à droite, cliquez sur `+ Create access key`, puis laissez les paramètres par défaut et cliquez sur `Create`.
+
+   Une fois l'accès créé, copiez et collez l'`Access Key` ainsi que la `Secret Key` dans le fichier `.env`.
+
+   Pour créer le bucket, lancez le script avec la commande suivante :
+
+   ```bash
+    pnpm run s3:create
+   ```
+
+7. Lancer le serveur en dev
 
    ```bash
    pnpm run dev
