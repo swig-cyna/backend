@@ -1,6 +1,6 @@
 import { db } from "@/db"
 import env from "@/env"
-import { deleteFileFromBucket, s3Client } from "@/utils/s3"
+import bucket from "@/utils/s3"
 
 const main = async () => {
   try {
@@ -18,7 +18,11 @@ const main = async () => {
     )
 
     const bucketObjects: string[] = []
-    const objectsStream = s3Client.listObjects(env.S3_NAME, "carousel/", true)
+    const objectsStream = bucket.client.listObjects(
+      env.S3_NAME,
+      "carousel/",
+      true,
+    )
 
     await new Promise<void>((resolve, reject) => {
       objectsStream.on("data", (obj) => {
@@ -51,7 +55,7 @@ const main = async () => {
 
     await Promise.all(
       orphanedImages.map(async (fileName) => {
-        const result = await deleteFileFromBucket({
+        const result = await bucket.deleteFile({
           bucketName: env.S3_NAME,
           fileName: `carousel/${fileName}`,
         })

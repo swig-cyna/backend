@@ -1,10 +1,9 @@
 /* eslint-disable no-unused-vars */
-/* eslint-disable no-console */
 import env from "@/env"
 import * as Minio from "minio"
 import stream from "stream"
 
-const s3Client = new Minio.Client({
+export const client = new Minio.Client({
   endPoint: env.S3_ENDPOINT,
   port: env.S3_PORT ? Number(env.S3_PORT) : undefined,
   accessKey: env.S3_ACCESS_KEY,
@@ -13,7 +12,7 @@ const s3Client = new Minio.Client({
 })
 
 export const checkBucketExists = async (bucketName: string) => {
-  const bucketExists = await s3Client.bucketExists(bucketName)
+  const bucketExists = await client.bucketExists(bucketName)
 
   if (!bucketExists) {
     throw new Error("Bucket does not exist")
@@ -40,7 +39,7 @@ const saveFile = async ({
     throw new Error("File already exists")
   }
 
-  await s3Client.putObject(bucketName, fileName, file)
+  await client.putObject(bucketName, fileName, file)
 }
 
 const checkIsExist = async ({
@@ -51,7 +50,7 @@ const checkIsExist = async ({
   fileName: string
 }) => {
   try {
-    await s3Client.statObject(bucketName, fileName)
+    await client.statObject(bucketName, fileName)
   } catch (error) {
     return false
   }
@@ -67,14 +66,14 @@ const getFile = async ({
   fileName: string
 }) => {
   try {
-    await s3Client.statObject(bucketName, fileName)
+    await client.statObject(bucketName, fileName)
   } catch (error) {
     console.error(error)
 
     return null
   }
 
-  return await s3Client.getObject(bucketName, fileName)
+  return await client.getObject(bucketName, fileName)
 }
 
 const deleteFile = async ({
@@ -85,7 +84,7 @@ const deleteFile = async ({
   fileName: string
 }) => {
   try {
-    await s3Client.removeObject(bucketName, fileName)
+    await client.removeObject(bucketName, fileName)
   } catch (error) {
     console.error(error)
 
@@ -96,6 +95,7 @@ const deleteFile = async ({
 }
 
 export default {
+  client,
   checkBucketExists,
   saveFile,
   checkIsExist,
