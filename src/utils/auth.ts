@@ -8,6 +8,8 @@ import env from "@/env"
 import { betterAuth } from "better-auth"
 import { openAPI, admin as adminPlugin, twoFactor } from "better-auth/plugins"
 import { Roles } from "./permissions"
+import { stripe } from "@better-auth/stripe"
+import { stripeClient } from "@/utils/stripe"
 
 export const auth = betterAuth({
   appName: "Cyna",
@@ -62,6 +64,11 @@ export const auth = betterAuth({
         digits: 6,
         period: 30,
       },
+    }),
+    stripe({
+      stripeClient,
+      stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET,
+      createCustomerOnSignUp: true,
     }),
   ],
 })

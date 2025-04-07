@@ -24,6 +24,8 @@ const EnvSchema = z.object({
   RESEND_API_KEY: z.string(),
   FRONTEND_URL: z.string(),
   STRIPE_SECRET_KEY: z.string(),
+  STRIPE_WEBHOOK_SECRET: z.string(),
+
   S3_ENDPOINT: z.string(),
   S3_PORT: z.string().transform(Number),
   S3_NAME: z.string(),

@@ -25,6 +25,7 @@ export interface Product {
 
 export interface User {
   id: Generated<string>
+  stripeCustomerId: string | null
   name: string
   email: string
   emailVerified: boolean
@@ -82,6 +83,19 @@ export interface Verification {
   updatedAt: Date | null
 }
 
+export interface Subscription {
+  id: Generated<number>
+  userId: string
+  stripeCustomerId: string
+  stripeSubscriptionId: string
+  status: string
+  currentPeriodEnd: Date
+  createdAt: Generated<Date>
+  updatedAt: Generated<Date>
+  canceledAt: Date | null
+  quantity: number
+}
+
 export interface Database {
   products: Product
   user: User
@@ -90,4 +104,5 @@ export interface Database {
   session: Session
   verification: Verification
   carousel: CarouselSlide
+  subscription: Subscription
 }

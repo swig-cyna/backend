@@ -1,6 +1,8 @@
 import carousel from "@/routes/carousel/index.js"
 import index from "@/routes/index.js"
 import products from "@/routes/products/index.js"
+import stripe from "@/routes/stripe/index.js"
+import paymentMethode from "@/routes/paymentMethode/index.js"
 import { configOpenApi } from "@/utils/openApi.js"
 import { createRouter } from "@/utils/router.js"
 import { serve } from "@hono/node-server"
@@ -29,7 +31,7 @@ app.route("/api/admin", admin)
 
 configOpenApi(app)
 
-const routes = [index, products, carousel]
+const routes = [index, products, carousel, stripe, paymentMethode]
 routes.forEach((route) => {
   app.route("/", route)
 })

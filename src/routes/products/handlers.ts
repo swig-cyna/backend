@@ -1,7 +1,6 @@
 import { db } from "@/db"
 import type { AppRouteHandler } from "@/utils/types"
 import { Status } from "better-status-codes"
-import Stripe from "stripe"
 import type {
   GetProductByIdRoute,
   GetProductsRoute,
@@ -9,9 +8,7 @@ import type {
   UpdateProductRoute,
   DeleteProductRoute,
 } from "./routes"
-import env from "@/env"
-
-const stripe = new Stripe(env.STRIPE_SECRET_KEY)
+import { stripeClient } from "@/utils/stripe"
 
 export const getProducts: AppRouteHandler<GetProductsRoute> = async (c) => {
   const products = await db.selectFrom("products").selectAll().execute()
@@ -45,9 +42,12 @@ export const createProduct: AppRouteHandler<CreateProductRoute> = async (c) => {
   try {
     const { name, price, description, currency, interval } = c.req.valid("json")
 
-    const stripeProduct = await stripe.products.create({ name, description })
+    const stripeProduct = await stripeClient.products.create({
+      name,
+      description,
+    })
 
-    const stripePrice = await stripe.prices.create({
+    const stripePrice = await stripeClient.prices.create({
       product: stripeProduct.id,
       unit_amount: Math.round(price * 100),
       currency,
@@ -95,7 +95,7 @@ export const updateProduct: AppRouteHandler<UpdateProductRoute> = async (c) => {
       return c.json({ error: "Product not found" }, Status.NOT_FOUND)
     }
 
-    const stripeProduct = await stripe.products.update(
+    const stripeProduct = await stripeClient.products.update(
       product.stripe_product_id,
       {
         name: updates.name,
@@ -103,9 +103,9 @@ export const updateProduct: AppRouteHandler<UpdateProductRoute> = async (c) => {
       },
     )
 
-    await stripe.prices.update(product.stripe_price_id, { active: false })
+    await stripeClient.prices.update(product.stripe_price_id, { active: false })
 
-    const stripePrice = await stripe.prices.create({
+    const stripePrice = await stripeClient.prices.create({
       product: stripeProduct.id,
       unit_amount: Math.round(updates.price * 100),
       currency: updates.currency,
@@ -148,7 +148,9 @@ export const deleteProduct: AppRouteHandler<DeleteProductRoute> = async (c) => {
       .returningAll()
       .execute()
 
-    await stripe.products.update(products.stripe_product_id, { active: false })
+    await stripeClient.products.update(products.stripe_product_id, {
+      active: false,
+    })
 
     return c.json(products, Status.OK)
   } catch (err) {
