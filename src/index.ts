@@ -7,12 +7,11 @@ import "dotenv/config"
 import env from "./env"
 import { auth } from "./utils/auth"
 import { cors } from "hono/cors"
-import { sessionMiddleware } from "./utils/authMiddleware"
-import admin from "./routes/admin"
+import { dashboardMiddleware, sessionMiddleware } from "./utils/authMiddleware"
 
 const app = createRouter()
 
-app.use(sessionMiddleware)
+app.use("*", sessionMiddleware)
 
 app.use(
   cors({
@@ -21,9 +20,9 @@ app.use(
   }),
 )
 
-app.on(["POST", "GET"], "/api/auth/**", (c) => auth.handler(c.req.raw))
-
-app.route("/api/admin", admin)
+app.on(["POST", "GET"], "/api/auth/**", dashboardMiddleware, (c) =>
+  auth.handler(c.req.raw),
+)
 
 configOpenApi(app)
 

@@ -7,7 +7,7 @@ import {
 import env from "@/env"
 import { betterAuth } from "better-auth"
 import { openAPI, admin as adminPlugin, twoFactor } from "better-auth/plugins"
-import { Roles } from "./permissions"
+import { ac, admin, superadmin, support, user as userRole } from "./permissions"
 
 export const auth = betterAuth({
   appName: "Cyna",
@@ -54,7 +54,15 @@ export const auth = betterAuth({
   plugins: [
     openAPI(),
     adminPlugin({
-      adminRoles: [Roles.ADMIN, Roles.SUPERADMIN],
+      defaultRole: "user",
+      ac,
+      roles: {
+        userRole,
+        support,
+        admin,
+        superadmin,
+      },
+      adminRoles: ["support", "admin", "superadmin"],
     }),
     twoFactor({
       skipVerificationOnEnable: false,
