@@ -4,6 +4,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable("subscription")
     .addColumn("id", "serial", (col) => col.primaryKey())
+    .addColumn("productId", "integer", (col) => col.notNull())
     .addColumn("userId", "text", (col) => col.notNull())
     .addColumn("stripeCustomerId", "text", (col) => col.notNull())
     .addColumn("stripeSubscriptionId", "text", (col) => col.notNull())

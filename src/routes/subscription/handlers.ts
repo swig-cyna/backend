@@ -13,7 +13,8 @@ export const createSubscription: AppRouteHandler<
   CreateSubscriptionRoute
 > = async (c) => {
   try {
-    const { userId, priceId, quantity } = c.req.valid("json")
+    const { userId, productId, quantity, paymentMethodeId } =
+      c.req.valid("json")
 
     const user = await db
       .selectFrom("user")
@@ -30,15 +31,27 @@ export const createSubscription: AppRouteHandler<
       )
     }
 
+    const product = await db
+      .selectFrom("products")
+      .selectAll()
+      .where("id", "=", productId)
+      .executeTakeFirst()
+
+    if (!product) {
+      return c.json({ error: "Product not found" }, Status.NOT_FOUND)
+    }
+
     const subscription = await stripeClient.subscriptions.create({
       customer: user.stripeCustomerId,
-      items: [{ price: priceId, quantity }],
+      items: [{ price: product.stripe_price_id, quantity }],
+      default_payment_method: paymentMethodeId,
     })
 
     const [newSubscription] = await db
       .insertInto("subscription")
       .values({
         userId,
+        productId,
         stripeCustomerId: user.stripeCustomerId,
         stripeSubscriptionId: subscription.id,
         status: subscription.status,

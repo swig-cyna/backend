@@ -86,6 +86,7 @@ export interface Verification {
 export interface Subscription {
   id: Generated<number>
   userId: string
+  productId: number
   stripeCustomerId: string
   stripeSubscriptionId: string
   status: string
