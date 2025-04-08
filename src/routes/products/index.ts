@@ -5,16 +5,10 @@ import * as routes from "./routes.js"
 
 const router = createRouter()
 
-const routeHandlers = [
-  { route: routes.getProducts, handler: handlers.getProducts },
-  { route: routes.getProductById, handler: handlers.getProduct },
-  { route: routes.createProduct, handler: handlers.createProduct },
-  { route: routes.updateProduct, handler: handlers.updateProduct },
-  { route: routes.deleteProduct, handler: handlers.deleteProduct },
-]
-
-routeHandlers.forEach(({ route, handler }) => {
-  router.openapi(route, handler)
-})
+router.openapi(routes.getProducts, handlers.getProducts)
+router.openapi(routes.getProductById, handlers.getProduct)
+router.openapi(routes.createProduct, handlers.createProduct)
+router.openapi(routes.updateProduct, handlers.updateProduct)
+router.openapi(routes.deleteProduct, handlers.deleteProduct)
 
 export default router

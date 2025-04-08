@@ -1,12 +1,15 @@
+import carousel from "@/routes/carousel/index.js"
 import index from "@/routes/index.js"
 import products from "@/routes/products/index.js"
 import { configOpenApi } from "@/utils/openApi.js"
 import { createRouter } from "@/utils/router.js"
 import { serve } from "@hono/node-server"
 import "dotenv/config"
-import env from "./env"
-import { auth } from "./utils/auth"
 import { cors } from "hono/cors"
+import { cronScheduler } from "./crons/scheduler"
+import env from "./env"
+import admin from "./routes/admin"
+import { auth } from "./utils/auth"
 import { dashboardMiddleware, sessionMiddleware } from "./utils/authMiddleware"
 
 const app = createRouter()
@@ -26,7 +29,7 @@ app.on(["POST", "GET"], "/api/auth/**", dashboardMiddleware, (c) =>
 
 configOpenApi(app)
 
-const routes = [index, products]
+const routes = [index, products, carousel]
 routes.forEach((route) => {
   app.route("/", route)
 })
@@ -37,3 +40,5 @@ serve({
   fetch: app.fetch,
   port: env.PORT,
 })
+
+cronScheduler()
