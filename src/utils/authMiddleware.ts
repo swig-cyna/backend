@@ -15,7 +15,7 @@ export const sessionMiddleware: MiddlewareHandler = async (c, next) => {
 }
 
 export const dashboardMiddleware: MiddlewareHandler = async (c, next) => {
-  if (c.req.path.startsWith("/admin")) {
+  if (c.req.path.startsWith("/api/auth/admin")) {
     const user = c.get("user")
 
     const is2FAEnabled = user?.twoFactorEnabled
