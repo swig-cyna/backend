@@ -10,11 +10,11 @@ import { cronScheduler } from "./crons/scheduler"
 import env from "./env"
 import admin from "./routes/admin"
 import { auth } from "./utils/auth"
-import { sessionMiddleware } from "./utils/authMiddleware"
+import { dashboardMiddleware, sessionMiddleware } from "./utils/authMiddleware"
 
 const app = createRouter()
 
-app.use(sessionMiddleware)
+app.use("*", sessionMiddleware)
 
 app.use(
   cors({
@@ -23,9 +23,9 @@ app.use(
   }),
 )
 
-app.on(["POST", "GET"], "/api/auth/**", (c) => auth.handler(c.req.raw))
-
-app.route("/api/admin", admin)
+app.on(["POST", "GET"], "/api/auth/**", dashboardMiddleware, (c) =>
+  auth.handler(c.req.raw),
+)
 
 configOpenApi(app)
 
