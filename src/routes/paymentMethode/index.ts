@@ -5,13 +5,7 @@ import * as routes from "./routes"
 
 const router = createRouter()
 
-const routeHandlers = [
-  { route: routes.getPaymentMethods, handler: handlers.getPaymentMethods },
-  { route: routes.attachPaymentMethod, handler: handlers.attachPaymentMethod },
-]
-
-routeHandlers.forEach(({ route, handler }) => {
-  router.openapi(route as any, handler as any)
-})
+router.openapi(routes.getPaymentMethods, handlers.getPaymentMethods)
+router.openapi(routes.attachPaymentMethod, handlers.attachPaymentMethod)
 
 export default router

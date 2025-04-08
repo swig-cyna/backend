@@ -1,7 +1,7 @@
 import carousel from "@/routes/carousel/index.js"
 import index from "@/routes/index.js"
 import products from "@/routes/products/index.js"
-import stripe from "@/routes/stripe/index.js"
+import stripe from "@/routes/subscription/index.js"
 import paymentMethode from "@/routes/paymentMethode/index.js"
 import { configOpenApi } from "@/utils/openApi.js"
 import { createRouter } from "@/utils/router.js"

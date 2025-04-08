@@ -14,6 +14,16 @@ export const getSubscriptions = createRoute({
   },
 })
 
+export const getSubscription = createRoute({
+  tags,
+  path: "/subscriptions/{id}",
+  method: "get",
+  params: z.object({ id: z.string() }),
+  responses: {
+    [Status.OK]: jsonContent(z.array(SubscriptionSchema), "Get subscription"),
+  },
+})
+
 export const createSubscription = createRoute({
   tags,
   path: "/subscriptions",
@@ -31,16 +41,6 @@ export const createSubscription = createRoute({
       z.object({ error: z.string() }),
       "User not found or missing Stripe customer ID",
     ),
-  },
-})
-
-export const getSubscription = createRoute({
-  tags,
-  path: "/subscriptions/{id}",
-  method: "get",
-  params: z.object({ id: z.string() }),
-  responses: {
-    [Status.OK]: jsonContent(z.array(SubscriptionSchema), "Get subscription"),
   },
 })
 
