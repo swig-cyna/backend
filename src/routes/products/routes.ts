@@ -1,7 +1,8 @@
+import responses from "@/utils/responses"
 import { jsonContent } from "@/utils/router"
 import { createRoute, z } from "@hono/zod-openapi"
 import { Status } from "better-status-codes"
-import { ProductSchema } from "./schemas"
+import { CreateProductSchema, ProductSchema } from "./schemas"
 
 const tags = ["Products"]
 
@@ -9,8 +10,35 @@ export const getProducts = createRoute({
   tags,
   path: "/products",
   method: "get",
+  request: {
+    query: z.object({
+      page: z.string().min(1).default("1").optional(),
+      limit: z.string().min(1).max(100).default("1").optional(),
+      search: z.string().max(100).optional(),
+    }),
+  },
   responses: {
-    [Status.OK]: jsonContent(z.array(ProductSchema), "Get products"),
+    [Status.OK]: jsonContent(
+      responses.paginationSchema(ProductSchema),
+      "Get products",
+    ),
+    [Status.BAD_REQUEST]: jsonContent(
+      z.object({
+        error: z.string().openapi({
+          example:
+            "Invalid pagination parameters. Page must be >= 1 and limit must be between 1 and 100",
+        }),
+      }),
+      "Invalid pagination parameters",
+    ),
+    [Status.INTERNAL_SERVER_ERROR]: jsonContent(
+      z.object({
+        error: z.string().openapi({
+          example: "Failed to fetch products",
+        }),
+      }),
+      "Failed to fetch products",
+    ),
   },
 })
 
@@ -45,7 +73,7 @@ export const createProduct = createRoute({
   path: "/products",
   method: "post",
   request: {
-    body: jsonContent(ProductSchema, "Product data"),
+    body: jsonContent(CreateProductSchema, "Product data"),
   },
   responses: {
     [Status.CREATED]: jsonContent(ProductSchema, "Product created"),
@@ -63,7 +91,7 @@ export const createProduct = createRoute({
 export const updateProduct = createRoute({
   tags,
   path: "/products/{id}",
-  method: "patch",
+  method: "put",
   params: z.object({ id: z.number() }),
   request: {
     body: jsonContent(ProductSchema, "Product data"),
@@ -89,6 +117,48 @@ export const updateProduct = createRoute({
   },
 })
 
+export const addImageProduct = createRoute({
+  tags,
+  path: "/products/image",
+  method: "post",
+  request: {
+    body: {
+      content: {
+        "multipart/form-data": {
+          schema: {
+            type: "object",
+            required: ["image"],
+            properties: {
+              image: {
+                type: "string",
+                format: "binary",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  responses: {
+    [Status.OK]: jsonContent(
+      z.object({
+        imageId: z.string(),
+      }),
+      "Image uploaded",
+    ),
+    [Status.BAD_REQUEST]: jsonContent(
+      z.object({ error: z.string().openapi({ example: "Invalid data" }) }),
+      "Invalid data",
+    ),
+    [Status.INTERNAL_SERVER_ERROR]: jsonContent(
+      z.object({
+        error: z.string().openapi({ example: "Internal server error" }),
+      }),
+      "Internal server error",
+    ),
+  },
+})
+
 export const deleteProduct = createRoute({
   tags,
   path: "/products/{id}",
@@ -96,7 +166,22 @@ export const deleteProduct = createRoute({
   params: z.object({ id: z.number() }),
   responses: {
     [Status.OK]: jsonContent(ProductSchema, "delete product"),
-
+    [Status.NOT_FOUND]: jsonContent(
+      z.object({
+        error: z.string().openapi({
+          example: "Product not found",
+        }),
+      }),
+      "User not found",
+    ),
+    [Status.BAD_REQUEST]: jsonContent(
+      z.object({
+        error: z.string().openapi({
+          example: "Invalid id",
+        }),
+      }),
+      "Invalid id",
+    ),
     [Status.INTERNAL_SERVER_ERROR]: jsonContent(
       z.object({
         error: z.string().openapi({
@@ -112,4 +197,5 @@ export type GetProductsRoute = typeof getProducts
 export type GetProductByIdRoute = typeof getProductById
 export type CreateProductRoute = typeof createProduct
 export type UpdateProductRoute = typeof updateProduct
+export type AddImageProductRoute = typeof addImageProduct
 export type DeleteProductRoute = typeof deleteProduct

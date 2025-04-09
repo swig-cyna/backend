@@ -73,7 +73,7 @@ export const uploadSlideImage = createRoute({
   tags,
   path: "/carousel/image",
   method: "post",
-  middleware: [adminMiddleware],
+  middleware: [],
   params: z.object({ id: z.number() }),
   request: {
     body: {

@@ -11,4 +11,18 @@ const unauthorized = {
   description: "Unauthorized",
 }
 
-export default { unauthorized }
+const paginationSchema = (schema: z.ZodSchema) =>
+  z.object({
+    data: z.array(schema),
+    pagination: z.object({
+      currentPage: z.number(),
+      limit: z.number(),
+      totalItems: z.number(),
+      totalPages: z.number(),
+      remainingPages: z.number(),
+      hasNextPage: z.boolean(),
+      hasPreviousPage: z.boolean(),
+    }),
+  })
+
+export default { unauthorized, paginationSchema }
