@@ -43,8 +43,8 @@ export const getProducts: AppRouteHandler<GetProductsRoute> = async (c) => {
     if (search) {
       query = query.where((eb) =>
         eb.or([
-          eb("name", "like", eb.val(`%${search}%`)),
-          eb("description", "like", eb.val(`%${search}%`)),
+          eb("name", "like", eb.val(`%${search.toLowerCase()}%`)),
+          eb("description", "like", eb.val(`%${search.toLowerCase()}%`)),
         ]),
       )
     }
