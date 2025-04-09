@@ -82,6 +82,19 @@ export interface Verification {
   updatedAt: Date | null
 }
 
+export interface TicketTable {
+  id: Generated<number>
+  title: string
+  description: string
+  theme: string
+  status: "open" | "in_progress" | "closed"
+  user_id: string
+  assigned_to: string | null
+  created_at: ColumnType<Date, string, never>
+  updated_at: ColumnType<Date, string, never>
+  closed_at: ColumnType<Date | null, string | null, never>
+}
+
 export interface Database {
   products: Product
   user: User
@@ -90,4 +103,5 @@ export interface Database {
   session: Session
   verification: Verification
   carousel: CarouselSlide
+  ticket: TicketTable
 }
