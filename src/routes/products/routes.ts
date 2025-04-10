@@ -1,3 +1,4 @@
+import { adminMiddleware } from "@/utils/authMiddleware"
 import responses from "@/utils/responses"
 import { jsonContent } from "@/utils/router"
 import { createRoute, z } from "@hono/zod-openapi"
@@ -74,6 +75,7 @@ export const createProduct = createRoute({
   tags,
   path: "/products",
   method: "post",
+  middleware: [adminMiddleware],
   request: {
     body: jsonContent(CreateProductSchema, "Product data"),
   },
@@ -94,6 +96,7 @@ export const updateProduct = createRoute({
   tags,
   path: "/products/{id}",
   method: "put",
+  middleware: [adminMiddleware],
   request: {
     params: z.object({ id: z.string() }),
     body: jsonContent(ProductSchema, "Product data"),
@@ -123,6 +126,7 @@ export const addImageProduct = createRoute({
   tags,
   path: "/products/image",
   method: "post",
+  middleware: [adminMiddleware],
   request: {
     body: {
       content: {
@@ -165,6 +169,7 @@ export const deleteProduct = createRoute({
   tags,
   path: "/products/{id}",
   method: "delete",
+  middleware: [adminMiddleware],
   request: {
     params: z.object({ id: z.string() }),
   },
