@@ -198,6 +198,14 @@ export const deleteSlide = createRoute({
   params: z.object({ id: z.number() }),
   responses: {
     [Status.OK]: jsonContent(CarouselSlideSchema, "Delete carousel slide"),
+    [Status.BAD_REQUEST]: jsonContent(
+      z.object({
+        error: z.string().openapi({
+          example: "Invalid id",
+        }),
+      }),
+      "Invalid id",
+    ),
     [Status.NOT_FOUND]: jsonContent(
       z.object({
         error: z.string().openapi({

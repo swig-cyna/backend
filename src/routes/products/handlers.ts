@@ -130,6 +130,10 @@ export const getProduct: AppRouteHandler<GetProductByIdRoute> = async (c) => {
 
   const id = Number(rawId)
 
+  if (isNaN(id)) {
+    return c.json({ error: "Invalid id" }, Status.BAD_REQUEST)
+  }
+
   const rawProduct = await db
     .selectFrom("products")
     .select((eb) => [
@@ -148,6 +152,10 @@ export const getProduct: AppRouteHandler<GetProductByIdRoute> = async (c) => {
     ])
     .where("id", "=", id)
     .executeTakeFirst()
+
+  if (!rawProduct) {
+    return c.json({ error: "Product not found" }, Status.NOT_FOUND)
+  }
 
   const product = {
     ...rawProduct,
@@ -214,6 +222,11 @@ export const updateProduct: AppRouteHandler<UpdateProductRoute> = async (c) => {
   try {
     const { id: rawId } = c.req.param()
     const id = Number(rawId)
+
+    if (isNaN(id)) {
+      return c.json({ error: "Invalid id" }, Status.BAD_REQUEST)
+    }
+
     const updates = c.req.valid("json")
 
     const product = await db
@@ -350,6 +363,10 @@ export const deleteProduct: AppRouteHandler<DeleteProductRoute> = async (c) => {
 
     if (!id) {
       return c.json({ error: "Missing id" }, Status.BAD_REQUEST)
+    }
+
+    if (isNaN(id)) {
+      return c.json({ error: "Invalid id" }, Status.BAD_REQUEST)
     }
 
     const [products] = await db
