@@ -24,7 +24,9 @@ export const getSlide = createRoute({
   path: "/carousel/{id}",
   method: "get",
   middleware: [adminMiddleware],
-  params: z.object({ id: z.number() }),
+  request: {
+    params: z.object({ id: z.string() }),
+  },
   responses: {
     [Status.OK]: jsonContent(CarouselSlideSchema, "Get slide of carousel"),
     [Status.NOT_FOUND]: jsonContent(
@@ -74,7 +76,6 @@ export const uploadSlideImage = createRoute({
   path: "/carousel/image",
   method: "post",
   middleware: [adminMiddleware],
-  params: z.object({ id: z.number() }),
   request: {
     body: {
       content: {
@@ -126,8 +127,8 @@ export const updateSlide = createRoute({
   path: "/carousel/{id}",
   method: "put",
   middleware: [adminMiddleware],
-  params: z.object({ id: z.number() }),
   request: {
+    params: z.object({ id: z.string() }),
     body: jsonContent(CarouselSlideEditSchema, "Slide data"),
   },
   responses: {
@@ -158,8 +159,8 @@ export const changeSlidePosition = createRoute({
   path: "/carousel/{id}/position",
   method: "put",
   middleware: [adminMiddleware],
-  params: z.object({ id: z.number() }),
   request: {
+    params: z.object({ id: z.string() }),
     body: jsonContent(CarouselSlidePositionSchema, "Slide position data"),
   },
   responses: {
@@ -195,9 +196,19 @@ export const deleteSlide = createRoute({
   path: "/carousel/{id}",
   method: "delete",
   middleware: [adminMiddleware],
-  params: z.object({ id: z.number() }),
+  request: {
+    params: z.object({ id: z.string() }),
+  },
   responses: {
     [Status.OK]: jsonContent(CarouselSlideSchema, "Delete carousel slide"),
+    [Status.BAD_REQUEST]: jsonContent(
+      z.object({
+        error: z.string().openapi({
+          example: "Invalid id",
+        }),
+      }),
+      "Invalid id",
+    ),
     [Status.NOT_FOUND]: jsonContent(
       z.object({
         error: z.string().openapi({
