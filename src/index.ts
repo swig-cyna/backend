@@ -8,7 +8,6 @@ import "dotenv/config"
 import { cors } from "hono/cors"
 import { cronScheduler } from "./crons/scheduler"
 import env from "./env"
-import admin from "./routes/admin"
 import { auth } from "./utils/auth"
 import { dashboardMiddleware, sessionMiddleware } from "./utils/authMiddleware"
 
