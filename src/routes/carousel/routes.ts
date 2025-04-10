@@ -24,7 +24,9 @@ export const getSlide = createRoute({
   path: "/carousel/{id}",
   method: "get",
   middleware: [adminMiddleware],
-  params: z.object({ id: z.number() }),
+  request: {
+    params: z.object({ id: z.number() }),
+  },
   responses: {
     [Status.OK]: jsonContent(CarouselSlideSchema, "Get slide of carousel"),
     [Status.NOT_FOUND]: jsonContent(
@@ -52,6 +54,7 @@ export const createSlide = createRoute({
   method: "post",
   middleware: [adminMiddleware],
   request: {
+    params: z.object({ id: z.number() }),
     body: jsonContent(CarouselSlideEditSchema, "Carousel slide data"),
   },
   responses: {
@@ -126,8 +129,8 @@ export const updateSlide = createRoute({
   path: "/carousel/{id}",
   method: "put",
   middleware: [adminMiddleware],
-  params: z.object({ id: z.number() }),
   request: {
+    params: z.object({ id: z.number() }),
     body: jsonContent(CarouselSlideEditSchema, "Slide data"),
   },
   responses: {
@@ -160,6 +163,7 @@ export const changeSlidePosition = createRoute({
   middleware: [adminMiddleware],
   params: z.object({ id: z.number() }),
   request: {
+    params: z.object({ id: z.number() }),
     body: jsonContent(CarouselSlidePositionSchema, "Slide position data"),
   },
   responses: {

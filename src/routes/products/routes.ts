@@ -46,7 +46,9 @@ export const getProductById = createRoute({
   tags,
   path: "/products/{id}",
   method: "get",
-  params: z.object({ id: z.number() }),
+  request: {
+    params: z.object({ id: z.number() }),
+  },
   responses: {
     [Status.OK]: jsonContent(ProductSchema, "Get product"),
     [Status.NOT_FOUND]: jsonContent(
@@ -92,8 +94,8 @@ export const updateProduct = createRoute({
   tags,
   path: "/products/{id}",
   method: "put",
-  params: z.object({ id: z.number() }),
   request: {
+    params: z.object({ id: z.number() }),
     body: jsonContent(ProductSchema, "Product data"),
   },
   responses: {
@@ -163,7 +165,9 @@ export const deleteProduct = createRoute({
   tags,
   path: "/products/{id}",
   method: "delete",
-  params: z.object({ id: z.number() }),
+  request: {
+    params: z.object({ id: z.number() }),
+  },
   responses: {
     [Status.OK]: jsonContent(ProductSchema, "delete product"),
     [Status.NOT_FOUND]: jsonContent(
