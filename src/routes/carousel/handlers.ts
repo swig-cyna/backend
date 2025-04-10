@@ -111,7 +111,7 @@ export const createCarouselSlide: AppRouteHandler<CreateSlideRoute> = async (
 
     const position = lastPosition ? lastPosition.position + 1 : 0
 
-    const [newSlide] = await db
+    const newSlide = await db
       .insertInto("carousel")
       .values({
         title,
@@ -121,7 +121,7 @@ export const createCarouselSlide: AppRouteHandler<CreateSlideRoute> = async (
         position,
       })
       .returningAll()
-      .execute()
+      .executeTakeFirst()
 
     return c.json(newSlide, Status.CREATED)
   } catch (err) {
@@ -162,7 +162,7 @@ export const updateCarouselSlide: AppRouteHandler<UpdateSlideRoute> = async (
       return c.json({ error: "Slide not found" }, Status.NOT_FOUND)
     }
 
-    const [updatedSlide] = await db
+    const updatedSlide = await db
       .updateTable("carousel")
       .set({
         title: updates.title,
@@ -172,7 +172,7 @@ export const updateCarouselSlide: AppRouteHandler<UpdateSlideRoute> = async (
       })
       .where("id", "=", id)
       .returningAll()
-      .execute()
+      .executeTakeFirst()
 
     return c.json(updatedSlide, Status.OK)
   } catch (err) {
@@ -270,11 +270,11 @@ export const deleteCarouselSlide: AppRouteHandler<DeleteSlideRoute> = async (
       return c.json({ error: "Invalid id" }, Status.BAD_REQUEST)
     }
 
-    const [deletedSlide] = await db
+    const deletedSlide = await db
       .deleteFrom("carousel")
       .where("id", "=", id)
       .returningAll()
-      .execute()
+      .executeTakeFirst()
 
     if (!deletedSlide) {
       return c.json({ error: "Slide not found" }, Status.NOT_FOUND)

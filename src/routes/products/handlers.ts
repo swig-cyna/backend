@@ -185,7 +185,7 @@ export const createProduct: AppRouteHandler<CreateProductRoute> = async (c) => {
       recurring: { interval },
     })
 
-    const [newProduct] = await db
+    const newProduct = await db
       .insertInto("products")
       .values({
         name,
@@ -197,7 +197,14 @@ export const createProduct: AppRouteHandler<CreateProductRoute> = async (c) => {
         stripe_price_id: stripePrice.id,
       })
       .returningAll()
-      .execute()
+      .executeTakeFirst()
+
+    if (!newProduct) {
+      return c.json(
+        { error: "Failed to create product" },
+        Status.INTERNAL_SERVER_ERROR,
+      )
+    }
 
     if (images && images.length > 0) {
       const imageValues = images.map((image: string) => ({
@@ -256,7 +263,7 @@ export const updateProduct: AppRouteHandler<UpdateProductRoute> = async (c) => {
       recurring: { interval: updates.interval },
     })
 
-    const [updatedProduct] = await db
+    const updatedProduct = await db
       .updateTable("products")
       .set({
         name: updates.name,
@@ -268,7 +275,7 @@ export const updateProduct: AppRouteHandler<UpdateProductRoute> = async (c) => {
       })
       .where("id", "=", id)
       .returningAll()
-      .execute()
+      .executeTakeFirst()
 
     const images = await db
       .selectFrom("product_images")
@@ -369,15 +376,21 @@ export const deleteProduct: AppRouteHandler<DeleteProductRoute> = async (c) => {
       return c.json({ error: "Invalid id" }, Status.BAD_REQUEST)
     }
 
-    const [products] = await db
+    const deletedProduct = await db
       .deleteFrom("products")
       .where("id", "=", id)
       .returningAll()
-      .execute()
+      .executeTakeFirst()
 
-    await stripe.products.update(products.stripe_product_id, { active: false })
+    if (!deletedProduct) {
+      return c.json({ error: "Product not found" }, Status.NOT_FOUND)
+    }
 
-    return c.json(products, Status.OK)
+    await stripe.products.update(deletedProduct.stripe_product_id, {
+      active: false,
+    })
+
+    return c.json(deletedProduct, Status.OK)
   } catch (err) {
     console.error("Erreur lors de la suppression du produit:", err)
 
