@@ -15,7 +15,6 @@ export const configOpenApi = (app: OpenAPIHono) => {
     "/reference",
     apiReference({
       theme: "purple",
-      layout: "classic",
       defaultHttpClient: {
         targetKey: "js",
         clientKey: "fetch",

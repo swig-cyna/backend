@@ -28,4 +28,5 @@ lerna-debug.log*
 .DS_Store
 db-data
 bucket-data
+umami-data
 dist
