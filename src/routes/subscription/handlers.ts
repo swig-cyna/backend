@@ -1,12 +1,12 @@
 import { db } from "@/db"
+import { stripeClient } from "@/utils/stripe"
 import type { AppRouteHandler } from "@/utils/types"
 import { Status } from "better-status-codes"
-import { stripeClient } from "@/utils/stripe"
 import type {
-  CreateSubscriptionRoute,
-  GetSubscriptionsRoute,
   CancelSubscriptionRoute,
+  CreateSubscriptionRoute,
   GetSubscriptionRoute,
+  GetSubscriptionsRoute,
 } from "./routes"
 
 export const createSubscription: AppRouteHandler<
@@ -43,8 +43,14 @@ export const createSubscription: AppRouteHandler<
 
     const subscription = await stripeClient.subscriptions.create({
       customer: user.stripeCustomerId,
-      items: [{ price: product.stripe_price_id, quantity }],
+      items: [
+        {
+          price: product.stripe_price_id,
+          quantity,
+        },
+      ],
       default_payment_method: paymentMethodeId,
+      automatic_tax: { enabled: true },
     })
 
     const [newSubscription] = await db
