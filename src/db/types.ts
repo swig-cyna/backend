@@ -22,14 +22,12 @@ export interface CarouselSlide {
 export interface Product {
   id: Generated<number>
   name: string
-  price_month: number
-  price_year: number
+  price: number
   description: string
   currency: string
   interval: "day" | "week" | "month" | "year"
   stripe_product_id: string
-  stripe_price_month_id: string
-  stripe_price_year_id: string
+  stripe_price_id: string
   created_at: ColumnType<Date, string | undefined, never>
 }
 
