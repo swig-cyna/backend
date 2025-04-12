@@ -291,6 +291,7 @@ export const updateProduct: AppRouteHandler<UpdateProductRoute> = async (c) => {
         description: updates.description,
         currency: updates.currency,
         interval: updates.interval,
+        category_id: updates.category_id,
         stripe_price_id: stripePrice.id,
       })
       .where("id", "=", id)
