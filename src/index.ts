@@ -1,4 +1,5 @@
 import carousel from "@/routes/carousel/index.js"
+import categories from "@/routes/categories/index.js"
 import index from "@/routes/index.js"
 import products from "@/routes/products/index.js"
 import { configOpenApi } from "@/utils/openApi.js"
@@ -28,7 +29,7 @@ app.on(["POST", "GET"], "/api/auth/**", dashboardMiddleware, (c) =>
 
 configOpenApi(app)
 
-const routes = [index, products, carousel]
+const routes = [index, products, carousel, categories]
 routes.forEach((route) => {
   app.route("/", route)
 })

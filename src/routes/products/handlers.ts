@@ -63,6 +63,12 @@ export const getProducts: AppRouteHandler<GetProductsRoute> = async (c) => {
             .select("file")
             .whereRef("product_images.product_id", "=", "products.id"),
         ).as("images"),
+        jsonArrayFrom(
+          eb
+            .selectFrom("categories")
+            .select("name")
+            .whereRef("categories.id", "=", "products.category_id"),
+        ).as("categories"),
       ])
       .limit(limit)
       .offset(offset)
@@ -149,6 +155,12 @@ export const getProduct: AppRouteHandler<GetProductByIdRoute> = async (c) => {
           .select("file")
           .whereRef("product_images.product_id", "=", "products.id"),
       ).as("images"),
+      jsonArrayFrom(
+        eb
+          .selectFrom("categories")
+          .select(["categories.id", "categories.name"])
+          .whereRef("categories.id", "=", "products.category_id"),
+      ).as("category"),
     ])
     .where("id", "=", id)
     .executeTakeFirst()
@@ -173,8 +185,15 @@ export const getProduct: AppRouteHandler<GetProductByIdRoute> = async (c) => {
 
 export const createProduct: AppRouteHandler<CreateProductRoute> = async (c) => {
   try {
-    const { name, price, description, currency, interval, images } =
-      c.req.valid("json")
+    const {
+      name,
+      price,
+      description,
+      currency,
+      interval,
+      images,
+      category_id,
+    } = c.req.valid("json")
 
     const stripeProduct = await stripe.products.create({ name, description })
 
@@ -193,6 +212,7 @@ export const createProduct: AppRouteHandler<CreateProductRoute> = async (c) => {
         description,
         currency,
         interval,
+        category_id,
         stripe_product_id: stripeProduct.id,
         stripe_price_id: stripePrice.id,
       })
@@ -271,6 +291,7 @@ export const updateProduct: AppRouteHandler<UpdateProductRoute> = async (c) => {
         description: updates.description,
         currency: updates.currency,
         interval: updates.interval,
+        category_id: updates.category_id,
         stripe_price_id: stripePrice.id,
       })
       .where("id", "=", id)

@@ -99,7 +99,7 @@ export const updateProduct = createRoute({
   middleware: [adminMiddleware],
   request: {
     params: z.object({ id: z.string() }),
-    body: jsonContent(ProductSchema, "Product data"),
+    body: jsonContent(CreateProductSchema, "Product data"),
   },
   responses: {
     [Status.OK]: jsonContent(ProductSchema, "Product updated"),
