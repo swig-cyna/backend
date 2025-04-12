@@ -8,9 +8,11 @@ export const sessionMiddleware: MiddlewareHandler = async (c, next) => {
     c.set("user", session ? session.user : null)
     c.set("session", session ? session.session : null)
 
-    await next()
+    return await next()
   } catch (error) {
     console.error(error)
+
+    return c.json({ error: "Session invalide" }, 401)
   }
 }
 
@@ -18,13 +20,15 @@ export const dashboardMiddleware: MiddlewareHandler = async (c, next) => {
   if (c.req.path.startsWith("/api/auth/admin")) {
     const user = c.get("user")
 
+    if (!user) {
+      return c.json({ error: "Non authentifié" }, 401)
+    }
+
     const is2FAEnabled = user?.twoFactorEnabled
 
     if (!is2FAEnabled) {
       return c.json({ error: "2FA Required" }, 401)
     }
-
-    return await next()
   }
 
   return await next()
@@ -39,7 +43,7 @@ export const adminMiddleware: MiddlewareHandler = async (c, next) => {
 
   const allowedRoles = ["admin", "superadmin"]
 
-  if (!allowedRoles.includes(user.role)) {
+  if (!allowedRoles.includes(user?.role as string)) {
     return c.json({ error: "Forbidden: Insufficient permissions" }, 403)
   }
 
@@ -61,7 +65,7 @@ export const superadminMiddleware: MiddlewareHandler = async (c, next) => {
 
   const allowedRoles = ["superadmin"]
 
-  if (!allowedRoles.includes(user.role)) {
+  if (!allowedRoles.includes(user?.role as string)) {
     return c.json({ error: "Forbidden: Insufficient permissions" }, 403)
   }
 

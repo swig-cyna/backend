@@ -1,6 +1,7 @@
 import carousel from "@/routes/carousel/index.js"
 import index from "@/routes/index.js"
 import products from "@/routes/products/index.js"
+import tickets from "@/routes/tickets/index.js"
 import { configOpenApi } from "@/utils/openApi.js"
 import { createRouter } from "@/utils/router.js"
 import { serve } from "@hono/node-server"
@@ -8,7 +9,6 @@ import "dotenv/config"
 import { cors } from "hono/cors"
 import { cronScheduler } from "./crons/scheduler"
 import env from "./env"
-import admin from "./routes/admin"
 import { auth } from "./utils/auth"
 import { dashboardMiddleware, sessionMiddleware } from "./utils/authMiddleware"
 
@@ -29,7 +29,7 @@ app.on(["POST", "GET"], "/api/auth/**", dashboardMiddleware, (c) =>
 
 configOpenApi(app)
 
-const routes = [index, products, carousel]
+const routes = [index, products, carousel, tickets]
 routes.forEach((route) => {
   app.route("/", route)
 })

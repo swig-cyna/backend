@@ -89,6 +89,8 @@ export interface TicketTable {
   theme: string
   status: "open" | "in_progress" | "closed"
   user_id: string
+  user_name: string
+  user_email: string
   assigned_to: string | null
   created_at: ColumnType<Date, string, never>
   updated_at: ColumnType<Date, string, never>
