@@ -8,11 +8,36 @@ import { CreateTicketRoute, GetTicketsRoute } from "./routes"
 export const getTicketsHandler: AppRouteHandler<GetTicketsRoute> = async (
   c,
 ) => {
-  const tickets = await db
+  const user = c.get("user")
+
+  if (!user) {
+    return c.json({ error: "Utilisateur non authentifié" }, Status.UNAUTHORIZED)
+  }
+
+  const { context } = c.req.query()
+  const role = user.role ?? "user"
+
+  let ticketsQuery = db
     .selectFrom("ticket")
     .selectAll()
     .orderBy("created_at", "desc")
-    .execute()
+
+  if (context === "userspace") {
+    ticketsQuery = ticketsQuery.where("user_id", "=", user.id)
+  } else if (context === "backoffice") {
+    const allowedRoles = ["support", "admin", "superadmin"]
+
+    if (!allowedRoles.includes(role)) {
+      return c.json({ error: "Accès refusé" }, Status.FORBIDDEN)
+    }
+  } else {
+    return c.json(
+      { error: "Paramètre 'context' requis (userspace/backoffice)" },
+      Status.BAD_REQUEST,
+    )
+  }
+
+  const tickets = await ticketsQuery.execute()
 
   return c.json(tickets, Status.OK)
 }
