@@ -1,4 +1,4 @@
-import { sessionMiddleware } from "@/utils/authMiddleware"
+import { sessionMiddleware, supportMiddleware } from "@/utils/authMiddleware"
 import { jsonContent } from "@/utils/router"
 import { createRoute, z } from "@hono/zod-openapi"
 import { Status } from "better-status-codes"
@@ -51,5 +51,37 @@ export const createTicket = createRoute({
   },
 })
 
+export const deleteTicket = createRoute({
+  tags,
+  path: "/tickets/{id}",
+  method: "delete",
+  middleware: [sessionMiddleware, supportMiddleware],
+  params: z.object({ id: z.number() }),
+  responses: {
+    [Status.OK]: jsonContent(TicketSchema, "Ticket supprimé"),
+    [Status.BAD_REQUEST]: jsonContent(
+      z.object({ error: z.string() }),
+      "Requête invalide",
+    ),
+    [Status.NOT_FOUND]: jsonContent(
+      z.object({ error: z.string() }),
+      "Ticket introuvable",
+    ),
+    [Status.UNAUTHORIZED]: jsonContent(
+      z.object({ error: z.string() }),
+      "Non autorisé",
+    ),
+    [Status.FORBIDDEN]: jsonContent(
+      z.object({ error: z.string() }),
+      "Permissions insuffisantes",
+    ),
+    [Status.CONFLICT]: jsonContent(
+      z.object({ error: z.string() }),
+      "Conflit de données",
+    ),
+  },
+})
+
 export type GetTicketsRoute = typeof getTickets
 export type CreateTicketRoute = typeof createTicket
+export type DeleteTicketRoute = typeof deleteTicket

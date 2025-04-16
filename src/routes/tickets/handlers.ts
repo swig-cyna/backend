@@ -3,7 +3,7 @@ import type { AppRouteHandler } from "@/utils/types"
 import { Status } from "better-status-codes"
 
 import { sql } from "kysely"
-import { CreateTicketRoute, GetTicketsRoute } from "./routes"
+import { CreateTicketRoute, DeleteTicketRoute, GetTicketsRoute } from "./routes"
 
 export const getTicketsHandler: AppRouteHandler<GetTicketsRoute> = async (
   c,
@@ -71,6 +71,32 @@ export const createTicketHandler: AppRouteHandler<CreateTicketRoute> = async (
     }
 
     return c.json(formattedTicket, Status.CREATED)
+  } catch (err) {
+    return c.json({ error: (err as Error).message }, Status.BAD_REQUEST)
+  }
+}
+
+export const deleteTicketHandler: AppRouteHandler<DeleteTicketRoute> = async (
+  c,
+) => {
+  const { id: rawId } = c.req.param()
+
+  if (!rawId) {
+    return c.json({ error: "Missing id" }, Status.BAD_REQUEST)
+  }
+
+  const id = Number(rawId)
+
+  try {
+    const [deletedTicket] = await db
+      .deleteFrom("ticket")
+      .where("id", "=", id)
+      .returningAll()
+      .execute()
+
+    return deletedTicket
+      ? c.json(deletedTicket, Status.OK)
+      : c.json({ error: "Ticket non trouvé" }, Status.NOT_FOUND)
   } catch (err) {
     return c.json({ error: (err as Error).message }, Status.BAD_REQUEST)
   }
