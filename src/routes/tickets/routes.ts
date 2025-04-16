@@ -3,7 +3,7 @@ import { jsonContent } from "@/utils/router"
 import { createRoute, z } from "@hono/zod-openapi"
 import { Status } from "better-status-codes"
 
-import { TicketCreateSchema, TicketSchema } from "./schemas"
+import { TicketCreateSchema, TicketSchema, TicketUpdateSchema } from "./schemas"
 
 const tags = ["Tickets"]
 
@@ -82,6 +82,37 @@ export const deleteTicket = createRoute({
   },
 })
 
+export const updateTicket = createRoute({
+  tags,
+  path: "/tickets/{id}",
+  method: "patch",
+  middleware: [sessionMiddleware, supportMiddleware],
+  params: z.object({ id: z.number() }),
+  request: {
+    body: jsonContent(TicketUpdateSchema, "Champs à modifier"),
+  },
+  responses: {
+    [Status.OK]: jsonContent(TicketSchema, "Ticket mis à jour"),
+    [Status.BAD_REQUEST]: jsonContent(
+      z.object({ error: z.string() }),
+      "Requête invalide",
+    ),
+    [Status.NOT_FOUND]: jsonContent(
+      z.object({ error: z.string() }),
+      "Ticket introuvable",
+    ),
+    [Status.UNAUTHORIZED]: jsonContent(
+      z.object({ error: z.string() }),
+      "Non autorisé",
+    ),
+    [Status.FORBIDDEN]: jsonContent(
+      z.object({ error: z.string() }),
+      "Permissions insuffisantes",
+    ),
+  },
+})
+
 export type GetTicketsRoute = typeof getTickets
 export type CreateTicketRoute = typeof createTicket
 export type DeleteTicketRoute = typeof deleteTicket
+export type UpdateTicketRoute = typeof updateTicket

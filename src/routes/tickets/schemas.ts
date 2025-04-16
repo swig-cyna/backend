@@ -32,5 +32,11 @@ export const TicketCreateSchema = TicketSchema.omit({
   theme: z.string().min(1),
 })
 
+export const TicketUpdateSchema = z.object({
+  status: z.enum(["open", "in_progress", "closed"]).optional(),
+  assigned_to: z.string().nullable().optional(),
+})
+
 export type Ticket = z.infer<typeof TicketSchema>
 export type TicketCreate = z.infer<typeof TicketCreateSchema>
+export type TicketUpdate = z.infer<typeof TicketUpdateSchema>

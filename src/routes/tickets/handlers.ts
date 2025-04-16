@@ -4,7 +4,12 @@ import { Status } from "better-status-codes"
 
 import { sendSupportTicketEmail } from "@/emails/emailService"
 import { sql } from "kysely"
-import { CreateTicketRoute, DeleteTicketRoute, GetTicketsRoute } from "./routes"
+import {
+  CreateTicketRoute,
+  DeleteTicketRoute,
+  GetTicketsRoute,
+  UpdateTicketRoute,
+} from "./routes"
 
 export const getTicketsHandler: AppRouteHandler<GetTicketsRoute> = async (
   c,
@@ -104,6 +109,45 @@ export const deleteTicketHandler: AppRouteHandler<DeleteTicketRoute> = async (
 
     return deletedTicket
       ? c.json(deletedTicket, Status.OK)
+      : c.json({ error: "Ticket non trouvé" }, Status.NOT_FOUND)
+  } catch (err) {
+    return c.json({ error: (err as Error).message }, Status.BAD_REQUEST)
+  }
+}
+
+export const updateTicketHandler: AppRouteHandler<UpdateTicketRoute> = async (
+  c,
+) => {
+  const { id: rawId } = c.req.param()
+
+  if (!rawId) {
+    return c.json({ error: "Missing id" }, Status.BAD_REQUEST)
+  }
+
+  const id = Number(rawId)
+  const data = c.req.valid("json")
+
+  if (!data.status && !("assigned_to" in data)) {
+    return c.json({ error: "Aucun champ à modifier" }, Status.BAD_REQUEST)
+  }
+
+  try {
+    const [updatedTicket] = await db
+      .updateTable("ticket")
+      .set({
+        ...(data.status && { status: data.status }),
+        ...(data.assigned_to !== undefined && {
+          assigned_to: data.assigned_to,
+        }),
+        updated_at: sql`CURRENT_TIMESTAMP`,
+        ...(data.status === "closed" && { closed_at: sql`CURRENT_TIMESTAMP` }),
+      })
+      .where("id", "=", id)
+      .returningAll()
+      .execute()
+
+    return updatedTicket
+      ? c.json(updatedTicket, Status.OK)
       : c.json({ error: "Ticket non trouvé" }, Status.NOT_FOUND)
   } catch (err) {
     return c.json({ error: (err as Error).message }, Status.BAD_REQUEST)
