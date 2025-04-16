@@ -1,11 +1,12 @@
+import env from "@/env"
 import { render } from "@react-email/components"
+import { User } from "better-auth"
 import { createElement } from "react"
 import { Resend } from "resend"
-import env from "@/env"
-import VerificationEmail from "./templates/VerificationEmail"
-import PasswordResetEmail from "./templates/PasswordResetEmail"
 import ChangeEmail from "./templates/ChangeEmail"
-import { User } from "better-auth"
+import PasswordResetEmail from "./templates/PasswordResetEmail"
+import SupportTicketEmail from "./templates/SupportNotificationEmail"
+import VerificationEmail from "./templates/VerificationEmail"
 
 const resend = new Resend(env.RESEND_API_KEY)
 
@@ -73,5 +74,34 @@ export const sendChangeEmail = async (
       "Erreur lors de l'envoi de l'e-mail de notification de changement d'adresse:",
       error,
     )
+  }
+}
+
+export const sendSupportTicketEmail = async (
+  userName: string,
+  userEmail: string,
+  ticket: {
+    id: number
+    title: string
+    theme: string
+    description: string
+  },
+) => {
+  try {
+    await resend.emails.send({
+      from: "test@ralex.app",
+      to: env.SUPPORT_EMAIL,
+      subject: `#${ticket.id} [${ticket.theme}] - ${ticket.title}`,
+      html: await render(
+        createElement(SupportTicketEmail, {
+          userName,
+          userEmail,
+          ticket,
+        }),
+      ),
+    })
+    console.log("Email envoyé")
+  } catch (error) {
+    console.error("Erreur lors de l'envoi du ticket au support:", error)
   }
 }

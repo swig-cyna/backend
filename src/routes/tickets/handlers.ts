@@ -2,6 +2,7 @@ import { db } from "@/db"
 import type { AppRouteHandler } from "@/utils/types"
 import { Status } from "better-status-codes"
 
+import { sendSupportTicketEmail } from "@/emails/emailService"
 import { sql } from "kysely"
 import { CreateTicketRoute, DeleteTicketRoute, GetTicketsRoute } from "./routes"
 
@@ -69,6 +70,13 @@ export const createTicketHandler: AppRouteHandler<CreateTicketRoute> = async (
         ? new Date(newTicket.closed_at).toISOString()
         : null,
     }
+
+    await sendSupportTicketEmail(data.user_name, data.user_email, {
+      id: newTicket.id,
+      title: newTicket.title,
+      theme: newTicket.theme,
+      description: newTicket.description,
+    })
 
     return c.json(formattedTicket, Status.CREATED)
   } catch (err) {
