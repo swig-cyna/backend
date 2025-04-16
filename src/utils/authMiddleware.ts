@@ -34,6 +34,28 @@ export const dashboardMiddleware: MiddlewareHandler = async (c, next) => {
   return await next()
 }
 
+export const supportMiddleware: MiddlewareHandler = async (c, next) => {
+  const user = c.get("user")
+
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401)
+  }
+
+  const allowedRoles = ["support", "admin", "superadmin"]
+
+  if (!allowedRoles.includes(user?.role as string)) {
+    return c.json({ error: "Forbidden: Insufficient permissions" }, 403)
+  }
+
+  const is2FAEnabled = user?.twoFactorEnabled
+
+  if (!is2FAEnabled) {
+    return c.json({ error: "2FA Required" }, 401)
+  }
+
+  return await next()
+}
+
 export const adminMiddleware: MiddlewareHandler = async (c, next) => {
   const user = c.get("user")
 
