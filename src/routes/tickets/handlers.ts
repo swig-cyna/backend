@@ -25,8 +25,19 @@ export const getTicketsHandler: AppRouteHandler<GetTicketsRoute> = async (
 
   let ticketsQuery = db
     .selectFrom("ticket")
-    .selectAll()
-    .orderBy("created_at", "desc")
+    .leftJoin("user", "ticket.assigned_to", "user.id")
+    .select([
+      "ticket.id",
+      "ticket.title",
+      "ticket.status",
+      "ticket.theme",
+      "ticket.description",
+      "ticket.assigned_to",
+      "ticket.created_at",
+      "ticket.updated_at",
+      "user.name as assigned_to_name",
+    ])
+    .orderBy("ticket.created_at", "desc")
 
   if (context === "userspace") {
     ticketsQuery = ticketsQuery.where("user_id", "=", user.id)
