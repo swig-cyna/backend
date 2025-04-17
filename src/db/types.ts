@@ -22,14 +22,12 @@ export interface CarouselSlide {
 export interface Product {
   id: Generated<number>
   name: string
-  price_month: number
-  price_year: number
+  price: number
   description: string
   currency: string
   interval: "day" | "week" | "month" | "year"
   stripe_product_id: string
-  stripe_price_month_id: string
-  stripe_price_year_id: string
+  stripe_price_id: string
   created_at: ColumnType<Date, string | undefined, never>
 }
 
@@ -107,6 +105,39 @@ export interface Subscription {
   quantity: number
 }
 
+export interface Payment {
+  id: Generated<number>
+  userId: string
+  stripeCustomerId: string
+  stripePaymentIntentId: string
+  status: string
+  amount: number
+  quantity: number
+  createdAt: Generated<Date>
+  updatedAt: Generated<Date>
+  completedAt: Date | null
+}
+
+export interface OrderItem {
+  id: Generated<number>
+  orderId: number
+  productId: number
+  quantity: number
+  price: number
+  createdAt: Generated<Date>
+  updatedAt: Generated<Date>
+}
+
+export interface Order {
+  id: Generated<number>
+  userId: string
+  amount: number
+  status: string
+  paymentIntentId: string
+  createdAt: Generated<Date>
+  updatedAt: Generated<Date>
+}
+
 export interface Database {
   products: Product
   user: User
@@ -117,4 +148,7 @@ export interface Database {
   carousel: CarouselSlide
   subscription: Subscription
   product_images: ProductImage
+  payment: Payment
+  order: Order
+  orderItem: OrderItem
 }
