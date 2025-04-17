@@ -1,8 +1,10 @@
 import carousel from "@/routes/carousel/index.js"
 import index from "@/routes/index.js"
+import paymentIntent from "@/routes/paymentIntent/index.js"
+import paymentMethode from "@/routes/paymentMethode/index.js"
 import products from "@/routes/products/index.js"
 import stripe from "@/routes/subscription/index.js"
-import paymentMethode from "@/routes/paymentMethode/index.js"
+import webhook from "@/routes/webhook/index.js"
 import { configOpenApi } from "@/utils/openApi.js"
 import { createRouter } from "@/utils/router.js"
 import { serve } from "@hono/node-server"
@@ -30,7 +32,15 @@ app.on(["POST", "GET"], "/api/auth/**", dashboardMiddleware, (c) =>
 
 configOpenApi(app)
 
-const routes = [index, products, carousel, stripe, paymentMethode]
+const routes = [
+  index,
+  products,
+  carousel,
+  stripe,
+  paymentMethode,
+  paymentIntent,
+  webhook,
+]
 routes.forEach((route) => {
   app.route("/", route)
 })
