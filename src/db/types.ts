@@ -19,6 +19,14 @@ export interface CarouselSlide {
   updated_at?: ColumnType<Date, string | undefined, never>
 }
 
+export interface Category {
+  id: Generated<number>
+  name: string
+  color: string
+  created_at?: ColumnType<Date, string | undefined, never>
+  updated_at?: ColumnType<Date, string | undefined, never>
+}
+
 export interface Product {
   id: Generated<number>
   name: string
@@ -26,6 +34,7 @@ export interface Product {
   description: string
   currency: string
   interval: "day" | "week" | "month" | "year"
+  category_id: number | null
   stripe_product_id: string
   stripe_price_id: string
   created_at: ColumnType<Date, string | undefined, never>
@@ -151,4 +160,5 @@ export interface Database {
   payment: Payment
   order: Order
   orderItem: OrderItem
+  categories: Category
 }

@@ -23,6 +23,7 @@ const EnvSchema = z.object({
   BETTER_AUTH_URL: z.string(),
   RESEND_API_KEY: z.string(),
   FRONTEND_URL: z.string(),
+  SUBDOMAIN_CORS: z.string(),
   STRIPE_SECRET_KEY: z.string(),
   STRIPE_WEBHOOK_SECRET: z.string(),
 

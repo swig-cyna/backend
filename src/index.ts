@@ -1,4 +1,5 @@
 import carousel from "@/routes/carousel/index.js"
+import categories from "@/routes/categories/index.js"
 import index from "@/routes/index.js"
 import paymentIntent from "@/routes/paymentIntent/index.js"
 import paymentMethode from "@/routes/paymentMethode/index.js"
@@ -40,7 +41,9 @@ const routes = [
   paymentMethode,
   paymentIntent,
   webhook,
+  categories,
 ]
+
 routes.forEach((route) => {
   app.route("/", route)
 })

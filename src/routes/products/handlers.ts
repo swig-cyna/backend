@@ -54,8 +54,7 @@ export const getProducts: AppRouteHandler<GetProductsRoute> = async (c) => {
       .select((eb) => [
         "products.id",
         "products.name",
-        "products.price_month",
-        "products.price_year",
+        "products.price",
         "products.description",
         "products.currency",
         "products.interval",
@@ -65,6 +64,12 @@ export const getProducts: AppRouteHandler<GetProductsRoute> = async (c) => {
             .select("file")
             .whereRef("product_images.product_id", "=", "products.id"),
         ).as("images"),
+        jsonArrayFrom(
+          eb
+            .selectFrom("categories")
+            .select("name")
+            .whereRef("categories.id", "=", "products.category_id"),
+        ).as("categories"),
       ])
       .limit(limit)
       .offset(offset)
@@ -141,8 +146,7 @@ export const getProduct: AppRouteHandler<GetProductByIdRoute> = async (c) => {
     .select((eb) => [
       "products.id",
       "products.name",
-      "products.price_month",
-      "products.price_year",
+      "products.price",
       "products.description",
       "products.currency",
       "products.interval",
@@ -152,6 +156,12 @@ export const getProduct: AppRouteHandler<GetProductByIdRoute> = async (c) => {
           .select("file")
           .whereRef("product_images.product_id", "=", "products.id"),
       ).as("images"),
+      jsonArrayFrom(
+        eb
+          .selectFrom("categories")
+          .select(["categories.id", "categories.name"])
+          .whereRef("categories.id", "=", "products.category_id"),
+      ).as("category"),
     ])
     .where("id", "=", id)
     .executeTakeFirst()
@@ -178,12 +188,12 @@ export const createProduct: AppRouteHandler<CreateProductRoute> = async (c) => {
   try {
     const {
       name,
-      price_month,
-      price_year,
+      price,
       description,
       currency,
       interval,
       images,
+      category_id,
     } = c.req.valid("json")
 
     const stripeProduct = await stripeClient.products.create({
@@ -191,32 +201,24 @@ export const createProduct: AppRouteHandler<CreateProductRoute> = async (c) => {
       description,
     })
 
-    const stripePriceMonth = await stripe.prices.create({
+    const stripePrice = await stripe.prices.create({
       product: stripeProduct.id,
-      unit_amount: Math.round(price_month * 100),
+      unit_amount: Math.round(price * 100),
       currency,
       recurring: { interval: "month" },
-    })
-
-    const stripePriceYear = await stripe.prices.create({
-      product: stripeProduct.id,
-      unit_amount: Math.round(price_year * 100),
-      currency,
-      recurring: { interval: "year" },
     })
 
     const newProduct = await db
       .insertInto("products")
       .values({
         name,
-        price_month,
-        price_year,
+        price,
         description,
         currency,
         interval,
+        category_id,
         stripe_product_id: stripeProduct.id,
-        stripe_price_month_id: stripePriceMonth.id,
-        stripe_price_year_id: stripePriceYear.id,
+        stripe_price_id: stripePrice.id,
       })
       .returningAll()
       .executeTakeFirst()
@@ -276,34 +278,25 @@ export const updateProduct: AppRouteHandler<UpdateProductRoute> = async (c) => {
       },
     )
 
-    await stripe.prices.update(product.stripe_price_month_id, { active: false })
-    await stripe.prices.update(product.stripe_price_year_id, { active: false })
+    await stripe.prices.update(product.stripe_price_id, { active: false })
 
-    const stripePriceMonth = await stripe.prices.create({
+    const stripePrice = await stripe.prices.create({
       product: stripeProduct.id,
-      unit_amount: Math.round(updates.price_month * 100),
+      unit_amount: Math.round(updates.price * 100),
       currency: updates.currency,
       recurring: { interval: "month" },
-    })
-
-    const stripePriceYear = await stripe.prices.create({
-      product: stripeProduct.id,
-      unit_amount: Math.round(updates.price_year * 100),
-      currency: updates.currency,
-      recurring: { interval: "year" },
     })
 
     const updatedProduct = await db
       .updateTable("products")
       .set({
         name: updates.name,
-        price_month: updates.price_month,
-        price_year: updates.price_year,
+        price: updates.price,
         description: updates.description,
         currency: updates.currency,
         interval: updates.interval,
-        stripe_price_month_id: stripePriceMonth.id,
-        stripe_price_year_id: stripePriceYear.id,
+        category_id: updates.category_id,
+        stripe_price_id: stripePrice.id,
       })
       .where("id", "=", id)
       .returningAll()

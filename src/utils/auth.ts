@@ -21,6 +21,7 @@ export const auth = betterAuth({
   advanced: {
     crossSubDomainCookies: {
       enabled: true,
+      ...(env.NODE_ENV === "production" && { domain: env.SUBDOMAIN_CORS }),
     },
     defaultCookieAttributes: {
       sameSite: "none",
