@@ -1,11 +1,12 @@
+import env from "@/env"
 import { render } from "@react-email/components"
+import { User } from "better-auth"
 import { createElement } from "react"
 import { Resend } from "resend"
-import env from "@/env"
-import VerificationEmail from "./templates/VerificationEmail"
-import PasswordResetEmail from "./templates/PasswordResetEmail"
 import ChangeEmail from "./templates/ChangeEmail"
-import { User } from "better-auth"
+import PasswordResetEmail from "./templates/PasswordResetEmail"
+import PaymentReceiptEmail from "./templates/PaymentReceiptEmail"
+import VerificationEmail from "./templates/VerificationEmail"
 
 const resend = new Resend(env.RESEND_API_KEY)
 
@@ -73,5 +74,36 @@ export const sendChangeEmail = async (
       "Erreur lors de l'envoi de l'e-mail de notification de changement d'adresse:",
       error,
     )
+  }
+}
+
+export const sendPaymentReceiptEmail = async (
+  userEmail: string,
+  username: string,
+  orderDetails: {
+    orderNumber: string
+    items: Array<{
+      name: string
+      quantity: number
+      price: number
+    }>
+    total: number
+    date: string
+  },
+) => {
+  try {
+    await resend.emails.send({
+      from: "test@ralex.app",
+      to: userEmail,
+      subject: `CYNA - Reçu de votre commande #${orderDetails.orderNumber}`,
+      html: await render(
+        createElement(PaymentReceiptEmail, {
+          username,
+          ...orderDetails,
+        }),
+      ),
+    })
+  } catch (error) {
+    console.error("Erreur lors de l'envoi du reçu de paiement:", error)
   }
 }

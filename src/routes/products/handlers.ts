@@ -1,6 +1,7 @@
 import { db } from "@/db"
 import env from "@/env"
 import bucket from "@/utils/s3"
+import { stripeClient } from "@/utils/stripe"
 import type { AppRouteHandler } from "@/utils/types"
 import { Status } from "better-status-codes"
 import { fileTypeFromBlob } from "file-type"
@@ -195,7 +196,10 @@ export const createProduct: AppRouteHandler<CreateProductRoute> = async (c) => {
       category_id,
     } = c.req.valid("json")
 
-    const stripeProduct = await stripe.products.create({ name, description })
+    const stripeProduct = await stripeClient.products.create({
+      name,
+      description,
+    })
 
     const stripePrice = await stripe.prices.create({
       product: stripeProduct.id,
@@ -266,7 +270,7 @@ export const updateProduct: AppRouteHandler<UpdateProductRoute> = async (c) => {
       return c.json({ error: "Product not found" }, Status.NOT_FOUND)
     }
 
-    const stripeProduct = await stripe.products.update(
+    const stripeProduct = await stripeClient.products.update(
       product.stripe_product_id,
       {
         name: updates.name,

@@ -42,6 +42,7 @@ export interface Product {
 
 export interface User {
   id: Generated<string>
+  stripeCustomerId: string | null
   name: string
   email: string
   emailVerified: boolean
@@ -99,6 +100,53 @@ export interface Verification {
   updatedAt: Date | null
 }
 
+export interface Subscription {
+  id: Generated<number>
+  userId: string
+  productId: number
+  stripeCustomerId: string
+  stripeSubscriptionId: string
+  status: string
+  currentPeriodEnd: Date
+  createdAt: Generated<Date>
+  updatedAt: Generated<Date>
+  canceledAt: Date | null
+  quantity: number
+}
+
+export interface Payment {
+  id: Generated<number>
+  userId: string
+  stripeCustomerId: string
+  stripePaymentIntentId: string
+  status: string
+  amount: number
+  quantity: number
+  createdAt: Generated<Date>
+  updatedAt: Generated<Date>
+  completedAt: Date | null
+}
+
+export interface OrderItem {
+  id: Generated<number>
+  orderId: number
+  productId: number
+  quantity: number
+  price: number
+  createdAt: Generated<Date>
+  updatedAt: Generated<Date>
+}
+
+export interface Order {
+  id: Generated<number>
+  userId: string
+  amount: number
+  status: string
+  paymentIntentId: string
+  createdAt: Generated<Date>
+  updatedAt: Generated<Date>
+}
+
 export interface Database {
   products: Product
   user: User
@@ -107,6 +155,10 @@ export interface Database {
   session: Session
   verification: Verification
   carousel: CarouselSlide
+  subscription: Subscription
   product_images: ProductImage
+  payment: Payment
+  order: Order
+  orderItem: OrderItem
   categories: Category
 }

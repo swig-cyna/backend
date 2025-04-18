@@ -5,6 +5,8 @@ import {
   sendVerificationEmail,
 } from "@/emails/emailService"
 import env from "@/env"
+import { stripeClient } from "@/utils/stripe"
+import { stripe } from "@better-auth/stripe"
 import { betterAuth } from "better-auth"
 import { admin as adminPlugin, openAPI, twoFactor } from "better-auth/plugins"
 import { ac, admin, superadmin, support, user as userRole } from "./permissions"
@@ -71,6 +73,11 @@ export const auth = betterAuth({
         digits: 6,
         period: 30,
       },
+    }),
+    stripe({
+      stripeClient,
+      stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET,
+      createCustomerOnSignUp: true,
     }),
   ],
 })
