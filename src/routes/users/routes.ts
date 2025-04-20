@@ -12,13 +12,10 @@ export const listUsers = createRoute({
   middleware: [sessionMiddleware, supportMiddleware],
   request: {
     query: z.object({
-      role: z
-        .array(z.string())
-        .optional()
-        .openapi({
-          example: ["support", "admin"],
-          description: "Filtrer par rôle (ex: support, admin)",
-        }),
+      role: z.string().optional().openapi({
+        example: "support,admin",
+        description: "Filtrer par rôle (ex: support, admin)",
+      }),
       id: z.string().optional().openapi({
         example: "usr_abc123",
         description: "Filtrer par ID utilisateur",

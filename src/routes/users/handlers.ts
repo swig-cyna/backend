@@ -5,7 +5,6 @@ import { ListUsersRoute } from "./routes"
 
 export const listUsersHandler: AppRouteHandler<ListUsersRoute> = async (c) => {
   const { role, id, limit = 20, offset = 0 } = c.req.valid("query")
-
   let query = db
     .selectFrom("user")
     .select(["id", "name", "role"])
@@ -13,7 +12,8 @@ export const listUsersHandler: AppRouteHandler<ListUsersRoute> = async (c) => {
     .offset(Number(offset))
 
   if (role) {
-    query = query.where("role", "in", role)
+    const roles = role.split(",").map((r) => r.trim())
+    query = query.where("role", "in", roles)
   }
 
   if (id) {
@@ -21,6 +21,7 @@ export const listUsersHandler: AppRouteHandler<ListUsersRoute> = async (c) => {
   }
 
   const users = await query.execute()
+  console.log(users)
 
   return c.json({ users }, Status.OK)
 }
