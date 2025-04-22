@@ -61,7 +61,7 @@ export const createPaymentIntent: AppRouteHandler<
     })
 
     const paymentIntent = await stripeClient.paymentIntents.create({
-      amount: Math.round(totalAmount * 100),
+      amount: Math.round(totalAmount * 1.2 * 100),
       currency: "eur",
       customer: user.stripeCustomerId,
       payment_method: paymentMethodId,
@@ -86,7 +86,7 @@ export const createPaymentIntent: AppRouteHandler<
         stripeCustomerId: user.stripeCustomerId,
         stripePaymentIntentId: paymentIntent.id,
         status: paymentIntent.status,
-        amount: totalAmount,
+        amount: totalAmount * 1.2,
         quantity: cartItems.reduce((acc, item) => acc + item.quantity, 0),
       })
       .returningAll()
