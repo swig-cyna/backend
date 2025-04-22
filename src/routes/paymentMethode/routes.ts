@@ -49,5 +49,59 @@ export const attachPaymentMethod = createRoute({
   },
 })
 
+export const updatePaymentMethod = createRoute({
+  tags,
+  path: "/payment-methods",
+  method: "put",
+  request: {
+    body: jsonContent(
+      z.object({
+        paymentMethodId: z.string(),
+        name: z.string().optional(),
+        expMonth: z.number().optional(),
+        expYear: z.number().optional(),
+      }),
+      "Payment method update data",
+    ),
+  },
+  responses: {
+    [Status.OK]: jsonContent(
+      z.object({ message: z.string() }),
+      "Payment method update successfully",
+    ),
+    [Status.INTERNAL_SERVER_ERROR]: jsonContent(
+      z.object({ error: z.string() }),
+      "Stripe error",
+    ),
+    [Status.NOT_FOUND]: jsonContent(
+      z.object({ error: z.string() }),
+      "Method not found",
+    ),
+  },
+})
+
+export const deletePaymentMethod = createRoute({
+  tags,
+  path: "/payment-methods/{id}",
+  method: "delete",
+  params: z.object({ id: z.string() }),
+  responses: {
+    [Status.OK]: jsonContent(
+      z.object({ message: z.string() }),
+      "Payment method delete successfully",
+    ),
+    [Status.INTERNAL_SERVER_ERROR]: jsonContent(
+      z.object({ error: z.string() }),
+      "Stripe error",
+    ),
+    [Status.NOT_FOUND]: jsonContent(
+      z.object({ error: z.string() }),
+      "Method not found",
+    ),
+  },
+})
+
 export type AttachPaymentMethodRoute = typeof attachPaymentMethod
 export type GetPaymentMethodsRoute = typeof getPaymentMethods
+export type UpdatePaymentMethodRoute = typeof updatePaymentMethod
+export type DeletePaymentMethodRoute = typeof deletePaymentMethod

@@ -7,5 +7,7 @@ const router = createRouter()
 
 router.openapi(routes.getPaymentMethods, handlers.getPaymentMethods)
 router.openapi(routes.attachPaymentMethod, handlers.attachPaymentMethod)
+router.openapi(routes.updatePaymentMethod, handlers.updatePaymentMethod)
+router.openapi(routes.deletePaymentMethod, handlers.deletePaymentMethod)
 
 export default router
