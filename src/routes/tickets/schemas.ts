@@ -37,6 +37,14 @@ export const TicketUpdateSchema = z.object({
   assigned_to: z.string().nullable().optional(),
 })
 
+export const PublicTicketSchema = TicketSchema.omit({
+  user_id: true,
+  user_name: true,
+  user_email: true,
+  closed_at: true,
+})
+
 export type Ticket = z.infer<typeof TicketSchema>
 export type TicketCreate = z.infer<typeof TicketCreateSchema>
 export type TicketUpdate = z.infer<typeof TicketUpdateSchema>
+export type PublicTicket = z.infer<typeof PublicTicketSchema>

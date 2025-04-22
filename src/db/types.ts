@@ -93,7 +93,7 @@ export interface TicketTable {
   user_email: string
   assigned_to: string | null
   created_at: ColumnType<Date, string, never>
-  updated_at: ColumnType<Date, string, never>
+  updated_at: ColumnType<Date, string | undefined, Date | string | undefined>
   closed_at: ColumnType<Date | null, string | null, never>
 }
 

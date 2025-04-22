@@ -3,7 +3,12 @@ import { jsonContent } from "@/utils/router"
 import { createRoute, z } from "@hono/zod-openapi"
 import { Status } from "better-status-codes"
 
-import { TicketCreateSchema, TicketSchema, TicketUpdateSchema } from "./schemas"
+import {
+  PublicTicketSchema,
+  TicketCreateSchema,
+  TicketSchema,
+  TicketUpdateSchema,
+} from "./schemas"
 
 const tags = ["Tickets"]
 
@@ -18,7 +23,7 @@ export const getTickets = createRoute({
     }),
   },
   responses: {
-    [Status.OK]: jsonContent(z.array(TicketSchema), "Liste des tickets"),
+    [Status.OK]: jsonContent(z.array(PublicTicketSchema), "Liste des tickets"),
     [Status.UNAUTHORIZED]: jsonContent(
       z.object({ error: z.string() }),
       "Non autorisé",
