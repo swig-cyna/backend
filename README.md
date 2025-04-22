@@ -44,7 +44,21 @@
     pnpm run s3:create
    ```
 
-7. Lancer le serveur en dev
+7. Configurer umami
+   Rendez-vous sur [http://localhost:3002/login](http://localhost:3000/login) et connectez-vous avec les identifiants par defaults.
+
+   - Username: `admin`
+   - Password: `umami`
+
+   Aller dans `Settings` dans la bar de navigation et cliquer sur `Add website`
+
+   Donné lui un nom et l'url du frontend
+
+   Une fois ajouté cliquer sur la ligne du site que vous venez d'ajouter et cliquer sur le bouton `Edit` puis aller dans `Tracking Code` et copié coller le `website id` qu'il y a dans `data-website-id`
+
+   Puis mettez le dans la variable d'environnement `UMAMI_WEBSITE_ID` dans le fichier `.env` du frontend
+
+8. Lancer le serveur en dev
 
    ```bash
    pnpm run dev

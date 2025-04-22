@@ -1,5 +1,13 @@
 import type { ColumnType, Generated } from "kysely"
 
+export interface ProductImage {
+  id: Generated<number>
+  product_id: number
+  file: string
+  created_at: ColumnType<Date, string | undefined, never>
+  updated_at: ColumnType<Date, string | undefined, never>
+}
+
 export interface CarouselSlide {
   id: Generated<number>
   title: string
@@ -11,6 +19,14 @@ export interface CarouselSlide {
   updated_at?: ColumnType<Date, string | undefined, never>
 }
 
+export interface Category {
+  id: Generated<number>
+  name: string
+  color: string
+  created_at?: ColumnType<Date, string | undefined, never>
+  updated_at?: ColumnType<Date, string | undefined, never>
+}
+
 export interface Product {
   id: Generated<number>
   name: string
@@ -18,6 +34,7 @@ export interface Product {
   description: string
   currency: string
   interval: "day" | "week" | "month" | "year"
+  category_id: number | null
   stripe_product_id: string
   stripe_price_id: string
   created_at: ColumnType<Date, string | undefined, never>
@@ -25,6 +42,7 @@ export interface Product {
 
 export interface User {
   id: Generated<string>
+  stripeCustomerId: string | null
   name: string
   email: string
   emailVerified: boolean
@@ -97,6 +115,53 @@ export interface TicketTable {
   closed_at: ColumnType<Date | null, string | null, never>
 }
 
+export interface Subscription {
+  id: Generated<number>
+  userId: string
+  productId: number
+  stripeCustomerId: string
+  stripeSubscriptionId: string
+  status: string
+  currentPeriodEnd: Date
+  createdAt: Generated<Date>
+  updatedAt: Generated<Date>
+  canceledAt: Date | null
+  quantity: number
+}
+
+export interface Payment {
+  id: Generated<number>
+  userId: string
+  stripeCustomerId: string
+  stripePaymentIntentId: string
+  status: string
+  amount: number
+  quantity: number
+  createdAt: Generated<Date>
+  updatedAt: Generated<Date>
+  completedAt: Date | null
+}
+
+export interface OrderItem {
+  id: Generated<number>
+  orderId: number
+  productId: number
+  quantity: number
+  price: number
+  createdAt: Generated<Date>
+  updatedAt: Generated<Date>
+}
+
+export interface Order {
+  id: Generated<number>
+  userId: string
+  amount: number
+  status: string
+  paymentIntentId: string
+  createdAt: Generated<Date>
+  updatedAt: Generated<Date>
+}
+
 export interface Database {
   products: Product
   user: User
@@ -106,4 +171,10 @@ export interface Database {
   verification: Verification
   carousel: CarouselSlide
   ticket: TicketTable
+  subscription: Subscription
+  product_images: ProductImage
+  payment: Payment
+  order: Order
+  orderItem: OrderItem
+  categories: Category
 }

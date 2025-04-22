@@ -21,7 +21,6 @@ export const listUsersHandler: AppRouteHandler<ListUsersRoute> = async (c) => {
   }
 
   const users = await query.execute()
-  console.log(users)
 
   return c.json({ users }, Status.OK)
 }

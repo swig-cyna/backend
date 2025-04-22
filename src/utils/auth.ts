@@ -5,8 +5,10 @@ import {
   sendVerificationEmail,
 } from "@/emails/emailService"
 import env from "@/env"
+import { stripeClient } from "@/utils/stripe"
+import { stripe } from "@better-auth/stripe"
 import { betterAuth } from "better-auth"
-import { openAPI, admin as adminPlugin, twoFactor } from "better-auth/plugins"
+import { admin as adminPlugin, openAPI, twoFactor } from "better-auth/plugins"
 import { ac, admin, superadmin, support, user as userRole } from "./permissions"
 
 export const auth = betterAuth({
@@ -19,6 +21,7 @@ export const auth = betterAuth({
   advanced: {
     crossSubDomainCookies: {
       enabled: true,
+      ...(env.NODE_ENV === "production" && { domain: env.SUBDOMAIN_CORS }),
     },
     defaultCookieAttributes: {
       sameSite: "none",
@@ -70,6 +73,11 @@ export const auth = betterAuth({
         digits: 6,
         period: 30,
       },
+    }),
+    stripe({
+      stripeClient,
+      stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET,
+      createCustomerOnSignUp: true,
     }),
   ],
 })

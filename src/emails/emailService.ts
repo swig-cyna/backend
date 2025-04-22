@@ -5,6 +5,7 @@ import { createElement } from "react"
 import { Resend } from "resend"
 import ChangeEmail from "./templates/ChangeEmail"
 import PasswordResetEmail from "./templates/PasswordResetEmail"
+import PaymentReceiptEmail from "./templates/PaymentReceiptEmail"
 import SupportTicketEmail from "./templates/SupportNotificationEmail"
 import VerificationEmail from "./templates/VerificationEmail"
 
@@ -100,8 +101,38 @@ export const sendSupportTicketEmail = async (
         }),
       ),
     })
-    console.log("Email envoyé")
   } catch (error) {
     console.error("Erreur lors de l'envoi du ticket au support:", error)
+  }
+}
+
+export const sendPaymentReceiptEmail = async (
+  userEmail: string,
+  username: string,
+  orderDetails: {
+    orderNumber: string
+    items: Array<{
+      name: string
+      quantity: number
+      price: number
+    }>
+    total: number
+    date: string
+  },
+) => {
+  try {
+    await resend.emails.send({
+      from: "test@ralex.app",
+      to: userEmail,
+      subject: `CYNA - Reçu de votre commande #${orderDetails.orderNumber}`,
+      html: await render(
+        createElement(PaymentReceiptEmail, {
+          username,
+          ...orderDetails,
+        }),
+      ),
+    })
+  } catch (error) {
+    console.error("Erreur lors de l'envoi du reçu de paiement:", error)
   }
 }
