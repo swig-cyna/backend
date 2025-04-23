@@ -172,7 +172,7 @@ export interface Address {
   postal_code: string
   country: string
   created_at: ColumnType<Date, never, never>
-  updated_at: ColumnType<Date, never, never>
+  updated_at: ColumnType<Date, string | undefined, Date | string | undefined>
 }
 
 export interface Database {

@@ -20,5 +20,13 @@ export const AddressCreateSchema = AddressSchema.omit({
   updated_at: true,
 })
 
+export const AddressUpdateSchema = AddressSchema.omit({
+  id: true,
+  user_id: true,
+  created_at: true,
+  updated_at: true,
+}).partial()
+
 export type Address = z.infer<typeof AddressSchema>
 export type AdressCreate = z.infer<typeof AddressCreateSchema>
+export type AddressUpdate = z.infer<typeof AddressUpdateSchema>
