@@ -89,6 +89,38 @@ export const updateAddress = createRoute({
   },
 })
 
+export const deleteAddress = createRoute({
+  tags,
+  path: "/addresses/{id}",
+  method: "delete",
+  middleware: [sessionMiddleware],
+  request: {
+    params: z.object({ id: z.string() }),
+  },
+  responses: {
+    [Status.OK]: jsonContent(AddressSchema, "Address deleted"),
+    [Status.BAD_REQUEST]: jsonContent(
+      z.object({ error: z.string().openapi({ example: "Invalid id" }) }),
+      "Invalid id",
+    ),
+    [Status.NOT_FOUND]: jsonContent(
+      z.object({ error: z.string().openapi({ example: "Address not found" }) }),
+      "Address not found",
+    ),
+    [Status.UNAUTHORIZED]: jsonContent(
+      z.object({ error: z.string().openapi({ example: "Unauthorized" }) }),
+      "Unauthorized",
+    ),
+    [Status.INTERNAL_SERVER_ERROR]: jsonContent(
+      z.object({
+        error: z.string().openapi({ example: "Internal server error" }),
+      }),
+      "Internal server error",
+    ),
+  },
+})
+
 export type CreateAddressRoute = typeof createAddress
 export type GetAddressesRoute = typeof getAddresses
 export type UpdateAddressesRoute = typeof updateAddress
+export type DeleteAddressesRoute = typeof deleteAddress

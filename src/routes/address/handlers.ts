@@ -3,6 +3,7 @@ import type { AppRouteHandler } from "@/utils/types"
 import { Status } from "better-status-codes"
 import {
   CreateAddressRoute,
+  DeleteAddressesRoute,
   GetAddressesRoute,
   UpdateAddressesRoute,
 } from "./routes"
@@ -119,6 +120,57 @@ export const updateAddress: AppRouteHandler<UpdateAddressesRoute> = async (
     return c.json(updated, Status.OK)
   } catch (err) {
     console.error("Erreur lors de la modification de l'adresse:", err)
+
+    return c.json(
+      { error: (err as Error).message || "Internal server error" },
+      Status.INTERNAL_SERVER_ERROR,
+    )
+  }
+}
+
+export const deleteAddress: AppRouteHandler<DeleteAddressesRoute> = async (
+  c,
+) => {
+  try {
+    const { id: rawId } = c.req.param()
+
+    if (!rawId) {
+      return c.json({ error: "Missing id" }, Status.BAD_REQUEST)
+    }
+
+    const id = Number(rawId)
+
+    if (isNaN(id)) {
+      return c.json({ error: "Invalid id" }, Status.BAD_REQUEST)
+    }
+
+    const user = c.get("user")
+
+    if (!user?.id) {
+      return c.json({ error: "Unauthorized" }, Status.UNAUTHORIZED)
+    }
+
+    const address = await db
+      .selectFrom("address")
+      .selectAll()
+      .where("id", "=", id)
+      .where("user_id", "=", user.id)
+      .executeTakeFirst()
+
+    if (!address) {
+      return c.json({ error: "Address not found" }, Status.NOT_FOUND)
+    }
+
+    const deleted = await db
+      .deleteFrom("address")
+      .where("id", "=", id)
+      .where("user_id", "=", user.id)
+      .returningAll()
+      .executeTakeFirst()
+
+    return c.json(deleted, Status.OK)
+  } catch (err) {
+    console.error("Erreur lors de la suppression de l'adresse:", err)
 
     return c.json(
       { error: (err as Error).message || "Internal server error" },
