@@ -162,6 +162,19 @@ export interface Order {
   updatedAt: Generated<Date>
 }
 
+export interface Address {
+  id: Generated<number>
+  user_id: string
+  alias: string
+  line1: string
+  line2: string | null
+  city: string
+  postal_code: string
+  country: string
+  created_at: ColumnType<Date, never, never>
+  updated_at: ColumnType<Date, never, never>
+}
+
 export interface Database {
   products: Product
   user: User
@@ -177,4 +190,5 @@ export interface Database {
   order: Order
   orderItem: OrderItem
   categories: Category
+  address: Address
 }
