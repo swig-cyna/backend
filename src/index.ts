@@ -5,6 +5,8 @@ import paymentIntent from "@/routes/paymentIntent/index.js"
 import paymentMethode from "@/routes/paymentMethode/index.js"
 import products from "@/routes/products/index.js"
 import stripe from "@/routes/subscription/index.js"
+import tickets from "@/routes/tickets/index.js"
+import users from "@/routes/users/index.js"
 import webhook from "@/routes/webhook/index.js"
 import { configOpenApi } from "@/utils/openApi.js"
 import { createRouter } from "@/utils/router.js"
@@ -37,6 +39,8 @@ const routes = [
   index,
   products,
   carousel,
+  tickets,
+  users,
   stripe,
   paymentMethode,
   paymentIntent,

@@ -33,6 +33,7 @@ const EnvSchema = z.object({
   S3_ACCESS_KEY: z.string(),
   S3_SECRET_KEY: z.string(),
   S3_USE_SSL: z.string().transform((v) => v === "true"),
+  SUPPORT_EMAIL: z.string(),
 })
 
 expand(config())

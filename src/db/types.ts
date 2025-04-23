@@ -100,6 +100,21 @@ export interface Verification {
   updatedAt: Date | null
 }
 
+export interface TicketTable {
+  id: Generated<number>
+  title: string
+  description: string
+  theme: string
+  status: "open" | "in_progress" | "closed"
+  user_id: string
+  user_name: string
+  user_email: string
+  assigned_to: string | null
+  created_at: ColumnType<Date, string, never>
+  updated_at: ColumnType<Date, string | undefined, Date | string | undefined>
+  closed_at: ColumnType<Date | null, string | null, never>
+}
+
 export interface Subscription {
   id: Generated<number>
   userId: string
@@ -155,6 +170,7 @@ export interface Database {
   session: Session
   verification: Verification
   carousel: CarouselSlide
+  ticket: TicketTable
   subscription: Subscription
   product_images: ProductImage
   payment: Payment
