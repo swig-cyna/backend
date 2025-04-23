@@ -33,4 +33,25 @@ export const createAddress = createRoute({
   },
 })
 
-export type createAddressRoute = typeof createAddress
+export const getAddresses = createRoute({
+  tags,
+  path: "/addresses",
+  method: "get",
+  middleware: [sessionMiddleware],
+  responses: {
+    [Status.OK]: jsonContent(z.array(AddressSchema), "List of addresses"),
+    [Status.UNAUTHORIZED]: jsonContent(
+      z.object({ error: z.string().openapi({ example: "Unauthorized" }) }),
+      "Unauthorized",
+    ),
+    [Status.INTERNAL_SERVER_ERROR]: jsonContent(
+      z.object({
+        error: z.string().openapi({ example: "Internal server error" }),
+      }),
+      "Internal server error",
+    ),
+  },
+})
+
+export type CreateAddressRoute = typeof createAddress
+export type GetAddressesRoute = typeof getAddresses
