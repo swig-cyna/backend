@@ -118,7 +118,7 @@ export interface TicketTable {
 export interface Subscription {
   id: Generated<number>
   userId: string
-  productId: number
+  plantId: number
   stripeCustomerId: string
   stripeSubscriptionId: string
   status: string
@@ -126,7 +126,6 @@ export interface Subscription {
   createdAt: Generated<Date>
   updatedAt: Generated<Date>
   canceledAt: Date | null
-  quantity: number
 }
 
 export interface Payment {
@@ -162,6 +161,17 @@ export interface Order {
   updatedAt: Generated<Date>
 }
 
+export interface Plant {
+  id: Generated<number>
+  name: string
+  price: number
+  description: string
+  interval: "day" | "week" | "month" | "year"
+  stripe_product_id: string
+  stripe_price_id: string
+  created_at: ColumnType<Date, string | undefined, never>
+}
+
 export interface Database {
   products: Product
   user: User
@@ -177,4 +187,5 @@ export interface Database {
   order: Order
   orderItem: OrderItem
   categories: Category
+  plants: Plant
 }
