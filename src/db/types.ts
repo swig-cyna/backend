@@ -158,6 +158,8 @@ export interface Order {
   amount: number
   status: string
   paymentIntentId: string
+  shipping_address: any
+  billing_address: any
   createdAt: Generated<Date>
   updatedAt: Generated<Date>
 }
