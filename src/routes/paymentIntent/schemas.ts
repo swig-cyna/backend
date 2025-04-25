@@ -17,10 +17,22 @@ export const CreatePaymentSchema = z.object({
   userId: z.string(),
   cartItems: z.array(z.object({ productId: z.number(), quantity: z.number() })),
   paymentMethodId: z.string(),
+  shipping: z.object({
+    address: z.object({
+      line1: z.string(),
+      line2: z.string().nullable(),
+      city: z.string(),
+      postal_code: z.string(),
+      country: z.string().length(2),
+    }),
+    name: z.string().optional(),
+  }),
 })
 
 export const ConfirmPaymentSchema = z.object({
   paymentIntentId: z.string(),
+  shippingAddress: z.any(),
+  billingAddress: z.any(),
 })
 
 export const OrderSchema = z.object({
@@ -29,6 +41,8 @@ export const OrderSchema = z.object({
   amount: z.number(),
   status: z.string(),
   paymentIntentId: z.string(),
+  shipping_address: z.any(),
+  billing_address: z.any(),
   createdAt: z.date(),
   updatedAt: z.date().nullable(),
 })
