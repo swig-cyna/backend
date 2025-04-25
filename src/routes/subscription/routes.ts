@@ -1,7 +1,11 @@
 import { jsonContent } from "@/utils/router"
 import { createRoute, z } from "@hono/zod-openapi"
 import { Status } from "better-status-codes"
-import { CreateSubscriptionSchema, SubscriptionSchema } from "./schemas"
+import {
+  CreateSubscriptionSchema,
+  SubscriptionSchema,
+  SubscriptionWithPlantSchema,
+} from "./schemas"
 
 const tags = ["Subscriptions"]
 
@@ -20,7 +24,10 @@ export const getSubscription = createRoute({
   method: "get",
   params: z.object({ id: z.string() }),
   responses: {
-    [Status.OK]: jsonContent(z.array(SubscriptionSchema), "Get subscription"),
+    [Status.OK]: jsonContent(
+      z.array(SubscriptionWithPlantSchema),
+      "Get subscription",
+    ),
   },
 })
 
@@ -47,7 +54,7 @@ export const createSubscription = createRoute({
 export const cancelSubscription = createRoute({
   tags,
   path: "/subscriptions/{id}/cancel",
-  method: "post",
+  method: "delete",
   params: z.object({ id: z.number() }),
   responses: {
     [Status.OK]: jsonContent(

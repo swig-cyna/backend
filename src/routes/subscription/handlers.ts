@@ -13,8 +13,7 @@ export const createSubscription: AppRouteHandler<
   CreateSubscriptionRoute
 > = async (c) => {
   try {
-    const { userId, productId, quantity, paymentMethodeId } =
-      c.req.valid("json")
+    const { userId, plantId, paymentMethodId, interval } = c.req.valid("json")
 
     const user = await db
       .selectFrom("user")
@@ -31,38 +30,63 @@ export const createSubscription: AppRouteHandler<
       )
     }
 
-    const product = await db
-      .selectFrom("products")
+    const plant = await db
+      .selectFrom("plants")
       .selectAll()
-      .where("id", "=", productId)
+      .where("id", "=", plantId)
       .executeTakeFirst()
 
-    if (!product) {
+    if (!plant) {
       return c.json({ error: "Product not found" }, Status.NOT_FOUND)
+    }
+
+    if (interval === "month") {
+      const subscription = await stripeClient.subscriptions.create({
+        customer: user.stripeCustomerId,
+        items: [
+          {
+            price: plant.stripe_price_id,
+          },
+        ],
+        default_payment_method: paymentMethodId,
+      })
+
+      const [newSubscription] = await db
+        .insertInto("subscription")
+        .values({
+          userId,
+          plantId,
+          stripeCustomerId: user.stripeCustomerId,
+          stripeSubscriptionId: subscription.id,
+          status: subscription.status,
+          currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+        })
+        .returningAll()
+        .execute()
+
+      return c.json(newSubscription, Status.CREATED)
     }
 
     const subscription = await stripeClient.subscriptions.create({
       customer: user.stripeCustomerId,
       items: [
         {
-          price: product.stripe_price_id,
-          quantity,
+          price: plant.stripe_price_id,
         },
       ],
-      default_payment_method: paymentMethodeId,
-      automatic_tax: { enabled: true },
+      cancel_at: Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60,
+      default_payment_method: paymentMethodId,
     })
 
     const [newSubscription] = await db
       .insertInto("subscription")
       .values({
         userId,
-        productId,
+        plantId,
         stripeCustomerId: user.stripeCustomerId,
         stripeSubscriptionId: subscription.id,
         status: subscription.status,
         currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-        quantity,
       })
       .returningAll()
       .execute()
@@ -94,13 +118,30 @@ export const getSubscription: AppRouteHandler<GetSubscriptionRoute> = async (
 ) => {
   const { id } = c.req.param()
 
-  const subscriptions = await db
+  const subscriptionsWithPlants = await db
     .selectFrom("subscription")
-    .selectAll()
-    .where("userId", "=", id)
+    .leftJoin("plants", "subscription.plantId", "plants.id")
+    .select([
+      "subscription.id",
+      "subscription.userId",
+      "subscription.plantId",
+      "subscription.stripeCustomerId",
+      "subscription.stripeSubscriptionId",
+      "subscription.status",
+      "subscription.currentPeriodEnd",
+      "subscription.createdAt",
+      "subscription.updatedAt",
+      "subscription.canceledAt",
+      "plants.name as plant_name",
+      "plants.price as plant_price",
+      "plants.description as plant_description",
+      "plants.interval as plant_interval",
+    ])
+    .where("subscription.userId", "=", id)
+    .where("subscription.status", "=", "active")
     .execute()
 
-  return c.json(subscriptions)
+  return c.json(subscriptionsWithPlants)
 }
 
 export const cancelSubscription: AppRouteHandler<
