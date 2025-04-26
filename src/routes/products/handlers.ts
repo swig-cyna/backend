@@ -26,6 +26,7 @@ export const getProducts: AppRouteHandler<GetProductsRoute> = async (c) => {
     const page = Number(c.req.query("page") || 1)
     const limit = Number(c.req.query("limit") || 10)
     const search = c.req.query("search") || ""
+    const categories = c.req.query("categories")
 
     if (page < 1 || limit < 1 || limit > 100) {
       return c.json(
@@ -48,6 +49,14 @@ export const getProducts: AppRouteHandler<GetProductsRoute> = async (c) => {
           eb("description", "like", eb.val(`%${search.toLowerCase()}%`)),
         ]),
       )
+    }
+
+    if (categories) {
+      const categoryIds = categories.split(",").map(Number).filter(Boolean)
+
+      if (categoryIds.length > 0) {
+        query = query.where("category_id", "in", categoryIds)
+      }
     }
 
     const rawProducts = await query
@@ -80,6 +89,7 @@ export const getProducts: AppRouteHandler<GetProductsRoute> = async (c) => {
       images: Array.isArray(product.images)
         ? product.images.map((img) => img.file)
         : [],
+      categories: Array.isArray(product.categories) ? product.categories : [],
     }))
 
     let countQuery = db.selectFrom("products")
@@ -91,6 +101,14 @@ export const getProducts: AppRouteHandler<GetProductsRoute> = async (c) => {
           eb("description", "like", eb.val(`%${search}%`)),
         ]),
       )
+    }
+
+    if (categories) {
+      const categoryIds = categories.split(",").map(Number).filter(Boolean)
+
+      if (categoryIds.length > 0) {
+        countQuery = countQuery.where("category_id", "in", categoryIds)
+      }
     }
 
     const countResult = await countQuery

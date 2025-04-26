@@ -16,6 +16,7 @@ export const getProducts = createRoute({
       page: z.string().min(1).default("1").optional(),
       limit: z.string().min(1).max(100).default("1").optional(),
       search: z.string().max(100).optional(),
+      categories: z.string().optional(),
     }),
   },
   responses: {
