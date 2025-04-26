@@ -8,6 +8,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("price", "decimal", (col) =>
       col.notNull().check(sql`price >= 0`),
     )
+    .addColumn("discount", "decimal", (col) => col.notNull())
     .addColumn("description", "text")
     .addColumn("interval", "text", (col) => col.notNull().defaultTo("month"))
     .addColumn("stripe_product_id", "text", (col) => col.notNull().unique())

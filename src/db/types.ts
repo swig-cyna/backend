@@ -167,6 +167,7 @@ export interface Plant {
   id: Generated<number>
   name: string
   price: number
+  discount: number
   description: string
   interval: "day" | "week" | "month" | "year"
   stripe_product_id: string
