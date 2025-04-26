@@ -16,6 +16,16 @@ export const getProducts = createRoute({
       page: z.string().min(1).default("1").optional(),
       limit: z.string().min(1).max(100).default("1").optional(),
       search: z.string().max(100).optional(),
+      categories: z.string().optional(),
+      range: z
+        .string()
+        .regex(/^\d+,\d+$/u)
+        .optional(),
+
+      sortBy: z
+        .enum(["newest", "price-asc", "price-desc"])
+        .default("newest")
+        .optional(),
     }),
   },
   responses: {
