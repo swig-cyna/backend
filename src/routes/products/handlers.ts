@@ -26,6 +26,12 @@ export const getProducts: AppRouteHandler<GetProductsRoute> = async (c) => {
     const page = Number(c.req.query("page") || 1)
     const limit = Number(c.req.query("limit") || 10)
     const search = c.req.query("search") || ""
+    const categories = c.req.query("categories")
+    const priceRange = c.req.query("priceRange")
+    const [minPrice, maxPrice] = priceRange
+      ? priceRange.split(",").map(Number)
+      : [0, 10000]
+    const sortBy = c.req.query("sortBy") || "newest"
 
     if (page < 1 || limit < 1 || limit > 100) {
       return c.json(
@@ -39,15 +45,114 @@ export const getProducts: AppRouteHandler<GetProductsRoute> = async (c) => {
 
     const offset = (page - 1) * limit
 
+    let exactProduct: any = null
+
+    if (search) {
+      exactProduct = await db
+        .selectFrom("products")
+        .select((eb) => [
+          "products.id",
+          "products.name",
+          "products.price",
+          "products.description",
+          "products.currency",
+          "products.interval",
+          jsonArrayFrom(
+            eb
+              .selectFrom("product_images")
+              .select("file")
+              .whereRef("product_images.product_id", "=", "products.id"),
+          ).as("images"),
+          jsonArrayFrom(
+            eb
+              .selectFrom("categories")
+              .select("name")
+              .whereRef("categories.id", "=", "products.category_id"),
+          ).as("categories"),
+        ])
+        .where((eb) =>
+          eb.and([
+            eb("name", "ilike", search.trim()),
+            categories
+              ? eb(
+                  "category_id",
+                  "in",
+                  categories.split(",").map(Number).filter(Boolean),
+                )
+              : eb.val(true),
+            eb("price", ">=", minPrice),
+            eb("price", "<=", maxPrice),
+          ]),
+        )
+        .executeTakeFirst()
+    }
+
+    if (exactProduct) {
+      return c.json(
+        {
+          data: [exactProduct],
+          pagination: {
+            currentPage: 1,
+            limit,
+            totalItems: 1,
+            totalPages: 1,
+            remainingPages: 0,
+            hasNextPage: false,
+            hasPreviousPage: false,
+          },
+        },
+        Status.OK,
+      )
+    }
+
     let query = db.selectFrom("products")
 
     if (search) {
+      const cleanedSearch = search.replace(/\d+/gu, "")
+      const keywords = cleanedSearch
+        .split(" ")
+        .filter(Boolean)
+        .filter((word) => word.length > 2)
+
       query = query.where((eb) =>
         eb.or([
-          eb("name", "like", eb.val(`%${search.toLowerCase()}%`)),
-          eb("description", "like", eb.val(`%${search.toLowerCase()}%`)),
+          ...keywords.map((word) =>
+            eb.or([
+              eb("name", "ilike", eb.val(`%${word}%`)),
+              eb("description", "ilike", eb.val(`%${word}%`)),
+            ]),
+          ),
         ]),
       )
+    }
+
+    if (categories) {
+      const categoryIds = categories.split(",").map(Number).filter(Boolean)
+
+      if (categoryIds.length > 0) {
+        query = query.where("category_id", "in", categoryIds)
+      }
+    }
+
+    if (priceRange) {
+      query = query
+        .where("price", ">=", minPrice)
+        .where("price", "<=", maxPrice)
+    }
+
+    switch (sortBy) {
+      case "price-asc":
+        query = query.orderBy("price", "asc")
+
+        break
+
+      case "price-desc":
+        query = query.orderBy("price", "desc")
+
+        break
+
+      default:
+        query = query.orderBy("created_at", "desc")
     }
 
     const rawProducts = await query
@@ -80,6 +185,7 @@ export const getProducts: AppRouteHandler<GetProductsRoute> = async (c) => {
       images: Array.isArray(product.images)
         ? product.images.map((img) => img.file)
         : [],
+      categories: Array.isArray(product.categories) ? product.categories : [],
     }))
 
     let countQuery = db.selectFrom("products")
@@ -91,6 +197,20 @@ export const getProducts: AppRouteHandler<GetProductsRoute> = async (c) => {
           eb("description", "like", eb.val(`%${search}%`)),
         ]),
       )
+    }
+
+    if (categories) {
+      const categoryIds = categories.split(",").map(Number).filter(Boolean)
+
+      if (categoryIds.length > 0) {
+        countQuery = countQuery.where("category_id", "in", categoryIds)
+      }
+    }
+
+    if (priceRange) {
+      countQuery = countQuery
+        .where("price", ">=", minPrice)
+        .where("price", "<=", maxPrice)
     }
 
     const countResult = await countQuery

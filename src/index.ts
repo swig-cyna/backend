@@ -1,6 +1,9 @@
+import address from "@/routes/address/index.js"
 import carousel from "@/routes/carousel/index.js"
 import categories from "@/routes/categories/index.js"
+import dashboard from "@/routes/dashboard/index.js"
 import index from "@/routes/index.js"
+import orders from "@/routes/orders/index.js"
 import paymentIntent from "@/routes/paymentIntent/index.js"
 import paymentMethode from "@/routes/paymentMethode/index.js"
 import plants from "@/routes/plants/index.js"
@@ -37,17 +40,21 @@ app.on(["POST", "GET"], "/api/auth/**", dashboardMiddleware, (c) =>
 configOpenApi(app)
 
 const routes = [
-  index,
-  products,
+  address,
   carousel,
+  categories,
+  index,
+  paymentIntent,
+  paymentMethode,
+  products,
+  stripe,
   tickets,
   users,
-  stripe,
-  paymentMethode,
-  paymentIntent,
   webhook,
+  dashboard,
   categories,
   plants,
+  orders,
 ]
 
 routes.forEach((route) => {

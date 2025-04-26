@@ -60,6 +60,16 @@ export const updatePaymentMethod = createRoute({
         name: z.string().optional(),
         expMonth: z.number().optional(),
         expYear: z.number().optional(),
+        address: z
+          .object({
+            line1: z.string(),
+            line2: z.string().optional(),
+            city: z.string(),
+            postal_code: z.string(),
+            country: z.string().length(2),
+          })
+          .optional(),
+        email: z.string().email().optional(),
       }),
       "Payment method update data",
     ),
