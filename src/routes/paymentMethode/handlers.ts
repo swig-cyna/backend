@@ -84,17 +84,27 @@ export const updatePaymentMethod: AppRouteHandler<
   UpdatePaymentMethodRoute
 > = async (c) => {
   try {
-    const { paymentMethodId, name, expMonth, expYear } = c.req.valid("json")
+    const { paymentMethodId, name, expMonth, expYear, address, email } =
+      c.req.valid("json")
 
-    await stripeClient.paymentMethods.update(paymentMethodId, {
-      billing_details: {
-        name,
-      },
-      card: {
-        exp_month: expMonth,
-        exp_year: expYear,
-      },
-    })
+    const updateData: any = {}
+
+    if (name || address || email) {
+      updateData.billing_details = {
+        ...(name && { name }),
+        ...(email && { email }),
+        ...(address && { address }),
+      }
+    }
+
+    if (expMonth || expYear) {
+      updateData.card = {
+        ...(expMonth && { exp_month: expMonth }),
+        ...(expYear && { exp_year: expYear }),
+      }
+    }
+
+    await stripeClient.paymentMethods.update(paymentMethodId, updateData)
 
     return c.json({ message: "Payment methode update successfully" }, Status.OK)
   } catch (err) {
