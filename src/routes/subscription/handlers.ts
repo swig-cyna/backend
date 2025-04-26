@@ -134,6 +134,7 @@ export const getSubscription: AppRouteHandler<GetSubscriptionRoute> = async (
       "subscription.canceledAt",
       "plants.name as plant_name",
       "plants.price as plant_price",
+      "plants.discount as plant_discount",
       "plants.description as plant_description",
       "plants.interval as plant_interval",
     ])

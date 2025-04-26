@@ -16,6 +16,7 @@ export const SubscriptionSchema = z.object({
 export const SubscriptionWithPlantSchema = SubscriptionSchema.extend({
   plant_name: z.string().nullable(),
   plant_price: z.number().nullable(),
+  plant_discount: z.number().nullable(),
   plant_description: z.string().nullable(),
   plant_interval: z
     .enum(["day", "week", "month", "year"])
