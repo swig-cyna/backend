@@ -27,6 +27,10 @@ export const getProducts: AppRouteHandler<GetProductsRoute> = async (c) => {
     const limit = Number(c.req.query("limit") || 10)
     const search = c.req.query("search") || ""
     const categories = c.req.query("categories")
+    const priceRange = c.req.query("priceRange")
+    const [minPrice, maxPrice] = priceRange
+      ? priceRange.split(",").map(Number)
+      : [0, 10000]
     const sortBy = c.req.query("sortBy") || "newest"
 
     if (page < 1 || limit < 1 || limit > 100) {
@@ -60,7 +64,11 @@ export const getProducts: AppRouteHandler<GetProductsRoute> = async (c) => {
       }
     }
 
-    console.log(sortBy)
+    if (priceRange) {
+      query = query
+        .where("price", ">=", minPrice)
+        .where("price", "<=", maxPrice)
+    }
 
     switch (sortBy) {
       case "price-asc":
@@ -127,6 +135,12 @@ export const getProducts: AppRouteHandler<GetProductsRoute> = async (c) => {
       if (categoryIds.length > 0) {
         countQuery = countQuery.where("category_id", "in", categoryIds)
       }
+    }
+
+    if (priceRange) {
+      countQuery = countQuery
+        .where("price", ">=", minPrice)
+        .where("price", "<=", maxPrice)
     }
 
     const countResult = await countQuery
