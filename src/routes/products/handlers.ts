@@ -45,13 +45,83 @@ export const getProducts: AppRouteHandler<GetProductsRoute> = async (c) => {
 
     const offset = (page - 1) * limit
 
+    let exactProduct: any = null
+
+    if (search) {
+      exactProduct = await db
+        .selectFrom("products")
+        .select((eb) => [
+          "products.id",
+          "products.name",
+          "products.price",
+          "products.description",
+          "products.currency",
+          "products.interval",
+          jsonArrayFrom(
+            eb
+              .selectFrom("product_images")
+              .select("file")
+              .whereRef("product_images.product_id", "=", "products.id"),
+          ).as("images"),
+          jsonArrayFrom(
+            eb
+              .selectFrom("categories")
+              .select("name")
+              .whereRef("categories.id", "=", "products.category_id"),
+          ).as("categories"),
+        ])
+        .where((eb) =>
+          eb.and([
+            eb("name", "ilike", search.trim()),
+            categories
+              ? eb(
+                  "category_id",
+                  "in",
+                  categories.split(",").map(Number).filter(Boolean),
+                )
+              : eb.val(true),
+            eb("price", ">=", minPrice),
+            eb("price", "<=", maxPrice),
+          ]),
+        )
+        .executeTakeFirst()
+    }
+
+    if (exactProduct) {
+      return c.json(
+        {
+          data: [exactProduct],
+          pagination: {
+            currentPage: 1,
+            limit,
+            totalItems: 1,
+            totalPages: 1,
+            remainingPages: 0,
+            hasNextPage: false,
+            hasPreviousPage: false,
+          },
+        },
+        Status.OK,
+      )
+    }
+
     let query = db.selectFrom("products")
 
     if (search) {
+      const cleanedSearch = search.replace(/\d+/gu, "")
+      const keywords = cleanedSearch
+        .split(" ")
+        .filter(Boolean)
+        .filter((word) => word.length > 2)
+
       query = query.where((eb) =>
         eb.or([
-          eb("name", "like", eb.val(`%${search.toLowerCase()}%`)),
-          eb("description", "like", eb.val(`%${search.toLowerCase()}%`)),
+          ...keywords.map((word) =>
+            eb.or([
+              eb("name", "ilike", eb.val(`%${word}%`)),
+              eb("description", "ilike", eb.val(`%${word}%`)),
+            ]),
+          ),
         ]),
       )
     }
