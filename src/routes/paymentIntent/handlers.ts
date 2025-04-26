@@ -13,7 +13,7 @@ export const createPaymentIntent: AppRouteHandler<
   CreatePaymentIntentRoute
 > = async (c) => {
   try {
-    const { userId, cartItems, paymentMethodId } = c.req.valid("json")
+    const { userId, cartItems, paymentMethodId, shipping } = c.req.valid("json")
 
     const user = await db
       .selectFrom("user")
@@ -65,6 +65,16 @@ export const createPaymentIntent: AppRouteHandler<
       currency: "eur",
       customer: user.stripeCustomerId,
       payment_method: paymentMethodId,
+      shipping: {
+        name: user.name || "Client",
+        address: {
+          line1: shipping.address.line1,
+          line2: shipping.address.line2 || "",
+          city: shipping.address.city,
+          postal_code: shipping.address.postal_code,
+          country: shipping.address.country,
+        },
+      },
       confirm: false,
       setup_future_usage: "off_session",
       metadata: {
@@ -76,6 +86,7 @@ export const createPaymentIntent: AppRouteHandler<
             quantity: item.quantity,
           })),
         ),
+        shipping: JSON.stringify(shipping),
       },
     })
 
@@ -120,7 +131,8 @@ export const confirmPayment: AppRouteHandler<ConfirmPaymentRoute> = async (
   c,
 ) => {
   try {
-    const { paymentIntentId } = c.req.valid("json")
+    const { paymentIntentId, shippingAddress, billingAddress } =
+      c.req.valid("json")
 
     const paymentIntent =
       await stripeClient.paymentIntents.retrieve(paymentIntentId)
@@ -176,6 +188,8 @@ export const confirmPayment: AppRouteHandler<ConfirmPaymentRoute> = async (
             amount: totalAmount,
             status: "completed",
             paymentIntentId: data.id,
+            shipping_address: JSON.stringify(shippingAddress),
+            billing_address: JSON.stringify(billingAddress),
           })
           .returningAll()
           .execute()

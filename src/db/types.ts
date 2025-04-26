@@ -158,8 +158,23 @@ export interface Order {
   amount: number
   status: string
   paymentIntentId: string
+  shipping_address: any
+  billing_address: any
   createdAt: Generated<Date>
   updatedAt: Generated<Date>
+}
+
+export interface Address {
+  id: Generated<number>
+  user_id: string
+  alias: string
+  line1: string
+  line2: string | null
+  city: string
+  postal_code: string
+  country: string
+  created_at: ColumnType<Date, never, never>
+  updated_at: ColumnType<Date, string | undefined, Date | string | undefined>
 }
 
 export interface Database {
@@ -177,4 +192,5 @@ export interface Database {
   order: Order
   orderItem: OrderItem
   categories: Category
+  address: Address
 }
