@@ -27,6 +27,7 @@ export const getProducts: AppRouteHandler<GetProductsRoute> = async (c) => {
     const limit = Number(c.req.query("limit") || 10)
     const search = c.req.query("search") || ""
     const categories = c.req.query("categories")
+    const sortBy = c.req.query("sortBy") || "newest"
 
     if (page < 1 || limit < 1 || limit > 100) {
       return c.json(
@@ -57,6 +58,23 @@ export const getProducts: AppRouteHandler<GetProductsRoute> = async (c) => {
       if (categoryIds.length > 0) {
         query = query.where("category_id", "in", categoryIds)
       }
+    }
+
+    console.log(sortBy)
+
+    switch (sortBy) {
+      case "price-asc":
+        query = query.orderBy("price", "asc")
+
+        break
+
+      case "price-desc":
+        query = query.orderBy("price", "desc")
+
+        break
+
+      default:
+        query = query.orderBy("created_at", "desc")
     }
 
     const rawProducts = await query
