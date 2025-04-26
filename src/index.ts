@@ -2,6 +2,7 @@ import address from "@/routes/address/index.js"
 import carousel from "@/routes/carousel/index.js"
 import categories from "@/routes/categories/index.js"
 import index from "@/routes/index.js"
+import orders from "@/routes/orders/index.js"
 import paymentIntent from "@/routes/paymentIntent/index.js"
 import paymentMethode from "@/routes/paymentMethode/index.js"
 import products from "@/routes/products/index.js"
@@ -48,6 +49,8 @@ const routes = [
   tickets,
   users,
   webhook,
+  categories,
+  orders,
 ]
 
 routes.forEach((route) => {
