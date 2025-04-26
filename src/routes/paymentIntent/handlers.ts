@@ -60,8 +60,27 @@ export const createPaymentIntent: AppRouteHandler<
       totalAmount += itemAmount
     })
 
+    const discount = await db
+      .selectFrom("subscription")
+      .selectAll()
+      .where("userId", "=", userId)
+      .where("status", "=", "active")
+      .execute()
+
+    if (discount.length !== 0) {
+      const plant = await db
+        .selectFrom("plants")
+        .selectAll()
+        .where("id", "=", discount[0].plantId)
+        .execute()
+
+      totalAmount -= (totalAmount * plant[0].discount) / 100
+    }
+
+    totalAmount *= 1.2
+
     const paymentIntent = await stripeClient.paymentIntents.create({
-      amount: Math.round(totalAmount * 1.2 * 100),
+      amount: Math.round(totalAmount * 100),
       currency: "eur",
       customer: user.stripeCustomerId,
       payment_method: paymentMethodId,
@@ -97,7 +116,7 @@ export const createPaymentIntent: AppRouteHandler<
         stripeCustomerId: user.stripeCustomerId,
         stripePaymentIntentId: paymentIntent.id,
         status: paymentIntent.status,
-        amount: totalAmount * 1.2,
+        amount: totalAmount,
         quantity: cartItems.reduce((acc, item) => acc + item.quantity, 0),
       })
       .returningAll()
@@ -163,6 +182,15 @@ export const confirmPayment: AppRouteHandler<ConfirmPaymentRoute> = async (
         .executeTakeFirst()
 
       if (existingOrder) {
+        await db
+          .updateTable("order")
+          .set({
+            shipping_address: JSON.stringify(shippingAddress),
+            billing_address: JSON.stringify(billingAddress),
+          })
+          .where("id", "=", existingOrder.id)
+          .execute()
+
         return c.json(
           {
             success: true,
