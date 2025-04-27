@@ -1,4 +1,6 @@
+import { AddressSchema } from "@/routes/address/schemas"
 import type { ColumnType, Generated } from "kysely"
+import { z } from "zod"
 
 export interface ProductImage {
   id: Generated<number>
@@ -155,10 +157,10 @@ export interface Order {
   id: Generated<number>
   userId: string
   amount: number
-  status: string
+  status: "succeeded" | "pending" | "failed" | "refunded" | "partially_refunded"
   paymentIntentId: string
-  shipping_address: any
-  billing_address: any
+  shipping_address: z.infer<typeof AddressSchema>
+  billing_address: z.infer<typeof AddressSchema>
   createdAt: Generated<Date>
   updatedAt: Generated<Date>
 }
