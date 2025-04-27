@@ -41,7 +41,7 @@ export const createPlant: AppRouteHandler<CreatePlantRoute> = async (c) => {
 
     const stripePrice = await stripeClient.prices.create({
       product: stripeProduct.id,
-      unit_amount: Math.round(price * 100),
+      unit_amount: Math.round(price * 1.2 * 100),
       currency: "eur",
       recurring: { interval },
     })
@@ -111,7 +111,7 @@ export const updatePlant: AppRouteHandler<updatePlantRoute> = async (c) => {
 
     const stripePrice = await stripeClient.prices.create({
       product: stripeProduct.id,
-      unit_amount: Math.round(updates.price * 100),
+      unit_amount: Math.round(updates.price * 1.2 * 100),
       currency: "eur",
       recurring: { interval: updates.interval },
     })
