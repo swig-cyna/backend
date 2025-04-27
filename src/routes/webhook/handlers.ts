@@ -88,6 +88,8 @@ async function handlePaymentIntentSucceeded(paymentIntent: any) {
           amount: paymentIntent.amount / 100,
           status: "completed",
           paymentIntentId: paymentIntent.id,
+          shipping_address: JSON.stringify("unknown"),
+          billing_address: JSON.stringify("unknown"),
         })
         .returningAll()
         .execute()

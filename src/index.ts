@@ -6,6 +6,7 @@ import index from "@/routes/index.js"
 import orders from "@/routes/orders/index.js"
 import paymentIntent from "@/routes/paymentIntent/index.js"
 import paymentMethode from "@/routes/paymentMethode/index.js"
+import plants from "@/routes/plants/index.js"
 import products from "@/routes/products/index.js"
 import stripe from "@/routes/subscription/index.js"
 import tickets from "@/routes/tickets/index.js"
@@ -52,6 +53,7 @@ const routes = [
   webhook,
   dashboard,
   categories,
+  plants,
   orders,
 ]
 
