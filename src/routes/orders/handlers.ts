@@ -5,7 +5,19 @@ import { Status } from "better-status-codes"
 
 export const getOrders: AppRouteHandler<GetOrdersRoute> = async (c) => {
   try {
-    const orders = await db.selectFrom("order").selectAll().execute()
+    const orders = await db
+      .selectFrom("order")
+      .leftJoin("user as u", "order.userId", "u.id")
+      .select([
+        "order.id",
+        "order.amount",
+        "order.createdAt",
+        "order.status as paymentStatus",
+        "u.name as customerName",
+        "order.shipping_address",
+        "order.billing_address",
+      ])
+      .execute()
 
     const formattedOrders = await Promise.all(
       orders.map(async (order) => {
@@ -30,17 +42,15 @@ export const getOrders: AppRouteHandler<GetOrdersRoute> = async (c) => {
             return {
               quantity: item.quantity,
               product: {
-                name: product.name,
-                price: product.price,
+                name: product?.name || "Deleted product",
+                price: product?.price || 0,
               },
             }
           }),
         )
 
         return {
-          id: order.id,
-          amount: order.amount,
-          createdAt: order.createdAt,
+          ...order,
           orderItem: itemsWithProducts,
         }
       }),

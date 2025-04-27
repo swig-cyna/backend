@@ -1,7 +1,7 @@
 import { jsonContent } from "@/utils/router"
 import { createRoute, z } from "@hono/zod-openapi"
 import { Status } from "better-status-codes"
-import { OrderSchema } from "./schemas"
+import { OrderSchema, OrdersSchema } from "./schemas"
 
 const tags = ["Orders"]
 
@@ -10,7 +10,7 @@ export const getOrders = createRoute({
   path: "/orders",
   method: "get",
   responses: {
-    [Status.OK]: jsonContent(z.array(OrderSchema), "Get all orders"),
+    [Status.OK]: jsonContent(z.array(OrdersSchema), "Get all orders"),
     [Status.INTERNAL_SERVER_ERROR]: jsonContent(
       z.object({ error: z.string() }),
       "Stripe error",
