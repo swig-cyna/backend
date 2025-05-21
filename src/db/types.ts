@@ -190,6 +190,19 @@ export interface Address {
   updated_at: ColumnType<Date, string | undefined, Date | string | undefined>
 }
 
+export interface Passkey {
+  id: string
+  name: string | null
+  publicKey: string
+  userId: string
+  credentialID: string
+  counter: number
+  deviceType: string | null
+  backedUp: boolean | null
+  transports: string | null
+  createdAt: ColumnType<Date, string | undefined, never>
+}
+
 export interface Database {
   products: Product
   user: User
@@ -207,4 +220,5 @@ export interface Database {
   categories: Category
   plants: Plant
   address: Address
+  passkey: Passkey
 }

@@ -9,6 +9,7 @@ import { stripeClient } from "@/utils/stripe"
 import { stripe } from "@better-auth/stripe"
 import { betterAuth } from "better-auth"
 import { admin as adminPlugin, openAPI, twoFactor } from "better-auth/plugins"
+import { passkey } from "better-auth/plugins/passkey"
 import { ac, admin, superadmin, support, user as userRole } from "./permissions"
 
 export const auth = betterAuth({
@@ -79,5 +80,6 @@ export const auth = betterAuth({
       stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET,
       createCustomerOnSignUp: true,
     }),
+    passkey(),
   ],
 })
