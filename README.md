@@ -44,7 +44,8 @@
     pnpm run s3:create
    ```
 
-7. Configurer umami
+7. Configurer Umami
+
    Rendez-vous sur [http://localhost:3002/login](http://localhost:3000/login) et connectez-vous avec les identifiants par defaults.
 
    - Username: `admin`
@@ -137,5 +138,5 @@ Exemples de commits:
 
 - Seed la base de données
   ```bash
-  pnpm kysely seed:
+  pnpm kysely seed:run
   ```
